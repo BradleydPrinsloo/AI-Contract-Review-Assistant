@@ -12,7 +12,6 @@ The verified release workflow uses these primary inputs:
 - Windows version metadata under `packaging/windows/`
 - Client-facing handoff documents
 - A PowerShell checksum-verification script
-- Three safe sample contract fixtures
 
 ## Build pipeline
 
@@ -31,8 +30,6 @@ Create clean versioned bundle directory
           +--> Copy executable
           +--> Copy client documentation
           +--> Copy verification script
-          +--> Copy and rename safe sample contracts
-          +--> Generate sample README
           +--> Generate START-HERE.cmd
           +--> Generate QUICK-START.txt
           +--> Generate RELEASE-MANIFEST.json
@@ -63,7 +60,7 @@ The bundle is designed for a simple portable Windows handoff:
 2. The client runs `START-HERE.cmd`.
 3. The launcher checks that the executable remains beside the launcher.
 4. The application opens without a traditional installer.
-5. The client can begin with safe bundled demonstration contracts.
+5. The client selects an authorized contract for review.
 
 ## Separation of concerns
 
@@ -71,7 +68,6 @@ The release tooling separates:
 
 - Application execution
 - Packaging and delivery
-- Demonstration content
 - Client instructions
 - Integrity verification
 - Release metadata
