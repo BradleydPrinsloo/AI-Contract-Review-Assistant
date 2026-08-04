@@ -1,6 +1,6 @@
-# Construction Contract Risk Scanner
+# AI-Contract-Scanner
 
-A Windows desktop application designed to assist with reviewing construction contracts, identifying potentially important risk language, and presenting findings in a structured format for human review.
+A Windows desktop application designed to assist with reviewing  contracts, identifying potentially important risk language, and presenting findings in a structured format for human review.
 
 > **Portfolio status:** This repository is being prepared as a professional project showcase. The public documentation currently describes the verified release and handoff workflow. Application source code and screenshots will be added only after private information, client data, credentials, and generated build files have been removed.
 
