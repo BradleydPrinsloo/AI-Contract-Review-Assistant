@@ -1,87 +1,110 @@
 # Architecture
 
-## Scope of this document
+## Overview
 
-This page documents the release and client-handoff architecture verified from the supplied `release_bundle.py` source file. It does not claim details about the scanning engine, graphical interface, storage layer, AI provider, or document parsers because those source files have not yet been reviewed for publication.
+AI Contract Scanner is a modular Windows desktop application that separates document extraction, rule evaluation, risk scoring, optional AI summarization, local persistence, reporting, and release packaging.
 
-## Release components
+## Application pipeline
 
-The verified release workflow uses these primary inputs:
+```text
+PDF / DOCX / TXT
+        │
+        ▼
+Document extraction
+        │
+        ├── Native text extraction
+        └── OCR fallback for scanned PDF pages
+        │
+        ▼
+Keyword and clause-pattern scanner
+        │
+        ├── Configurable rules and aliases
+        ├── Operative-language checks
+        ├── Negation and context checks
+        ├── Confidence assignment
+        └── Finding deduplication
+        │
+        ▼
+Risk engine
+        │
+        ├── Category weighting
+        ├── Severity multipliers
+        ├── Finding-type multipliers
+        ├── Category caps
+        └── Recommendations
+        │
+        ├──────────────┬────────────────┬──────────────────┐
+        ▼              ▼                ▼                  ▼
+Desktop UI       Local repository   CSV/TXT/DOCX     Optional AI
+                                      reports          summary
+```
 
-- `dist/ContractReviewAssistant.exe`
-- Windows version metadata under `packaging/windows/`
-- Client-facing handoff documents
-- A PowerShell checksum-verification script
+## Main components
 
-## Build pipeline
+- `main.py` — PySide6 desktop interface, background scan worker, findings table, summaries, repository browser, and exports
+- `contract_review_assistant/scanner.py` — document extraction, OCR fallback, clause scanning, confidence handling, deduplication, and report generation
+- `contract_review_assistant/risk_engine.py` — weighted scoring, ratings, top findings, and recommendations
+- `contract_review_assistant/repository.py` — JSON scan records, legacy-report import, searching, and report-path updates
+- `contract_review_assistant/keyword_library.py` — editable rule-library creation, normalization, and persistence
+- `contract_review_assistant/ai_notes.py` — optional OpenAI summary with a deterministic local fallback
+- `contract_review_assistant/app_paths.py` — development, packaged-build, export, and repository paths
+- `contract_review_assistant/release_bundle.py` — portable release bundle, manifest, ZIP, and SHA-256 generation
+- `contract_review_assistant/release_installer.py` — Inno Setup asset generation and signing-ready instructions
+
+## Local storage
+
+Packaged builds use:
+
+```text
+Documents\AI Contract Scanner Exports\
+├── keyword-library\keywords.json
+└── repository\*.json
+```
+
+The scanner records structured findings and searchable summary text locally. Real contracts and exported reports must not be committed to the repository.
+
+## Optional AI behavior
+
+AI assistance is optional. When `OPENAI_API_KEY` is unavailable or an API request fails, the application uses its rule-based summary instead. The deterministic scanner and risk engine remain the primary analysis path.
+
+## Release pipeline
 
 ```text
 Windows version metadata
-          |
-          v
-Extract product version
-          |
-          v
-Validate required inputs
-          |
-          v
-Create clean versioned bundle directory
-          |
-          +--> Copy executable
-          +--> Copy client documentation
-          +--> Copy verification script
-          +--> Generate START-HERE.cmd
-          +--> Generate QUICK-START.txt
-          +--> Generate RELEASE-MANIFEST.json
-          +--> Generate per-file SHA-256 manifest
-          |
-          v
-Create compressed portable ZIP
-          |
-          v
-Generate ZIP SHA-256 checksum
+          │
+          ▼
+Build AIContractScanner.exe
+          │
+          ▼
+Validate release inputs
+          │
+          ▼
+Create versioned portable bundle
+          │
+          ├── Copy executable and handoff documents
+          ├── Generate START-HERE.cmd
+          ├── Generate QUICK-START.txt
+          ├── Generate RELEASE-MANIFEST.json
+          └── Generate SHA-256 manifests
+          │
+          ▼
+Create verified ZIP archive
+          │
+          ▼
+Generate optional Inno Setup installer assets
 ```
 
 ## Integrity controls
 
-The release builder calculates SHA-256 hashes for delivered files and records file paths, file sizes, and hashes in release metadata. It also creates:
+The release tooling supports:
 
-- `BUNDLE-CONTENTS-SHA256.txt` for bundle-level file verification
-- `VERIFY-CHECKSUMS.ps1` for client-side checking
-- A separate `.sha256` file for the final ZIP archive
+- Per-file SHA-256 hashes
+- `BUNDLE-CONTENTS-SHA256.txt`
+- `VERIFY-CHECKSUMS.ps1`
+- Release metadata with file paths and sizes
+- A separate checksum for the final ZIP
+- Signed or unsigned release-state notes
 
-These controls help detect accidental corruption or modification after packaging.
+## Security boundary
 
-## Client experience
-
-The bundle is designed for a simple portable Windows handoff:
-
-1. The client extracts the ZIP.
-2. The client runs `START-HERE.cmd`.
-3. The launcher checks that the executable remains beside the launcher.
-4. The application opens without a traditional installer.
-5. The client selects an authorized contract for review.
-
-## Separation of concerns
-
-The release tooling separates:
-
-- Application execution
-- Packaging and delivery
-- Client instructions
-- Integrity verification
-- Release metadata
-
-This separation makes the handoff reproducible and easier to audit.
-
-## Architecture still to document
-
-The following sections will be added after their source files are reviewed:
-
-- Application-layer component diagram
-- Contract ingestion and parsing flow
-- Risk-rule evaluation pipeline
-- Optional AI-assisted processing
-- Persistence and export model
-- User-interface structure
-- Automated testing strategy
+The public repository excludes credentials, `.env` files, private contracts, client databases, generated reports, executables, installers, and release archives. The application supports internal contract review and does not provide legal advice.
