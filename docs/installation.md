@@ -14,7 +14,7 @@ A prepared release bundle is intended to be used as follows:
 4. Keep all delivered files together.
 5. Double-click `START-HERE.cmd`.
 6. In the application, choose **Open Contract**.
-7. Open one of the safe files in `sample_contracts/` for an initial demonstration.
+7. Select a contract that you are authorized to review.
 8. Choose **Scan Contract** and review the resulting score, findings, and summary.
 
 ## Integrity verification
