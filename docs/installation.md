@@ -2,52 +2,76 @@
 
 ## Public repository status
 
-The full application source and executable are not yet published in this repository. This guide currently documents the verified portable Windows handoff process.
-
-## Client use of a portable release
-
-A prepared release bundle is intended to be used as follows:
-
-1. Download or receive the versioned release ZIP from a trusted source.
-2. Verify the ZIP checksum when a `.sha256` file is supplied.
-3. Extract the complete ZIP to a local folder.
-4. Keep all delivered files together.
-5. Double-click `START-HERE.cmd`.
-6. In the application, choose **Open Contract**.
-7. Select a contract that you are authorized to review.
-8. Choose **Scan Contract** and review the resulting score, findings, and summary.
-
-## Integrity verification
-
-The release includes two verification methods:
-
-- `VERIFY-CHECKSUMS.ps1` verifies files inside the extracted bundle.
-- The ZIP `.sha256` file verifies the compressed archive before extraction.
-
-Only run releases obtained from a trusted source. A matching checksum confirms file integrity but does not independently establish who produced the file.
-
-## Windows SmartScreen
-
-Unsigned Windows executables may trigger a SmartScreen warning. The current release tooling records whether a build is signed. Users should only bypass a warning when they trust the release source and have verified the supplied checksum.
-
-## Local data notes
-
-The verified quick-start configuration indicates that local scan history is stored under:
-
-```text
-Documents\Contract Review Assistant Exports\repository
-```
-
-Exported reports are saved to the location selected by the user in the Save dialog.
+The repository contains the sanitized Python source used for the AI Contract Scanner portfolio build. Generated executables, private contracts, credentials, build outputs, and client data are intentionally excluded.
 
 ## Developer setup
 
-Developer installation steps cannot be documented accurately until the sanitized dependency files and complete source tree are reviewed. Future documentation will include:
+Create and activate a virtual environment, then install the published dependencies:
 
-- Supported Python version
-- Virtual-environment setup
-- Dependency installation
-- Development entry point
-- Test execution
-- Windows executable build process
-- Release-bundle command
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Run the desktop application from the project root:
+
+```powershell
+python main.py
+```
+
+The dependency list currently includes PySide6, PyMuPDF, python-docx, python-dotenv, OpenAI, and RapidOCR. A precise supported Python-version range will be added after the Windows build workflow is validated end to end.
+
+## Optional AI summaries
+
+The scanner works without an API key by generating a deterministic rule-based summary. To enable optional OpenAI summaries, set an environment variable before launching:
+
+```powershell
+$env:OPENAI_API_KEY = "your-key"
+```
+
+The model can be overridden with `OPENAI_MODEL`. Never commit keys or `.env` files.
+
+## Local data
+
+Packaged builds store editable rules and scan history under:
+
+```text
+Documents\AI Contract Scanner Exports\
+├── keyword-library\keywords.json
+└── repository\
+```
+
+Development runs use the local project `exports/` directory. Exported CSV, TXT, and DOCX reports are saved to the location selected in the Save dialog.
+
+## Portable Windows release
+
+A prepared release bundle is intended to be used as follows:
+
+1. Obtain the versioned release ZIP from a trusted source.
+2. Verify the supplied `.sha256` value when available.
+3. Extract the complete ZIP to a local folder.
+4. Keep all delivered files together.
+5. Double-click `START-HERE.cmd`.
+6. Choose **Open Contract**.
+7. Select an authorized PDF, DOCX, or TXT contract.
+8. Choose **Analyze Contract** and review the score, findings, and summary.
+
+## Integrity verification
+
+The release workflow supports:
+
+- `VERIFY-CHECKSUMS.ps1` for files inside the extracted bundle
+- `BUNDLE-CONTENTS-SHA256.txt` for per-file hashes
+- A separate `.sha256` file for the compressed ZIP
+
+A matching checksum verifies file integrity but does not independently establish who produced the release.
+
+## Windows SmartScreen
+
+Unsigned Windows executables may trigger a SmartScreen warning. Only continue when the release source is trusted and the supplied checksum has been verified.
+
+## Reproducible Windows build
+
+The repository should retain its PyInstaller `.spec` file once the final build configuration is validated. Build artifacts such as `build/`, `dist/`, installers, portable ZIPs, and executables remain excluded from source control.
