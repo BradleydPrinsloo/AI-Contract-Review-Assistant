@@ -71,23 +71,35 @@ def scan_chunks(chunks: Iterable[tuple[str, str]], rules: Iterable[dict]) -> lis
     findings: list[ScanResult] = []
     seen: set[tuple[str, str, str]] = set()
     for location, text in chunks:
-        sentences = _sentences(text)
-        for rule in rules:
-            phrase = str(rule.get("phrase", "")).strip()
-            aliases = [str(value).strip() for value in rule.get("aliases", []) if str(value).strip()]
-            terms = [phrase, *aliases]
-            for sentence in sentences:
+        for sentence in _sentences(text):
+            for rule in rules:
+                phrase = str(rule.get("phrase", "")).strip()
+                aliases = [str(value).strip() for value in rule.get("aliases", []) if str(value).strip()]
+                terms = [phrase, *aliases]
                 matched = next((term for term in terms if term and re.search(rf"\b{re.escape(term)}\b", sentence, re.I)), None)
                 if not matched:
+                    continue
+                finding_type = str(rule.get("finding_type", "Risk"))
+                if _is_nonoperative_reference(sentence, matched, finding_type):
                     continue
                 key = (location, phrase.casefold(), sentence.casefold())
                 if key in seen:
                     continue
                 seen.add(key)
-                finding_type = str(rule.get("finding_type", "Risk"))
                 risk = str(rule.get("risk", "Medium"))
                 confidence = _confidence(sentence, matched, finding_type)
-                findings.append(ScanResult(phrase or matched, str(rule.get("category", "General")), finding_type, risk, 0, confidence, location, str(rule.get("note", "Review the surrounding clause manually.")), sentence.strip(), f"Matched configured rule: {matched}"))
+                findings.append(ScanResult(
+                    phrase or matched,
+                    str(rule.get("category", "General")),
+                    finding_type,
+                    risk,
+                    0,
+                    confidence,
+                    location,
+                    str(rule.get("note", "Review the surrounding clause manually.")),
+                    sentence.strip(),
+                    f"Matched configured rule: {matched}",
+                ))
     return findings
 
 
@@ -96,13 +108,40 @@ def _sentences(text: str) -> list[str]:
     return [part.strip() for part in re.split(r"(?<=[.!?;])\s+", compact) if part.strip()]
 
 
+def _is_nonoperative_reference(sentence: str, matched: str, finding_type: str) -> bool:
+    lowered = sentence.casefold()
+    operative = any(token in lowered for token in (
+        " shall ", " must ", " agrees to ", " will ", " is required to ",
+        " may terminate", " is liable", " shall be liable", " warrants ",
+        " represents ", " indemnifies ", " shall indemnify", " agrees that",
+    ))
+    casual_markers = (
+        "for discussion", "discussion only", "mentioned", "reference only",
+        "example", "illustration", "generally", "may include", "could include",
+        "does not create", "does not establish", "is not intended to",
+        "no party is obligated", "no obligation", "not binding", "draft note",
+        "training material", "background information", "considered but rejected",
+    )
+    negated_obligation = any(token in lowered for token in (
+        "shall not", "not required", "does not apply", "is not liable",
+        "will not be liable", "no duty to", "no obligation to",
+    ))
+    if negated_obligation and finding_type.casefold() == "risk":
+        return True
+    if any(marker in lowered for marker in casual_markers) and not operative:
+        return True
+    if not operative and len(sentence.split()) < 8 and finding_type.casefold() == "risk":
+        return True
+    return False
+
+
 def _confidence(sentence: str, matched: str, finding_type: str) -> int:
     lowered = sentence.lower()
-    score = 65
-    if any(word in lowered for word in ("shall", "must", "agrees", "required", "may terminate", "liable")):
-        score += 20
-    if any(word in lowered for word in ("not required", "shall not", "does not apply", "for discussion only")):
-        score -= 25
+    score = 60
+    if any(word in lowered for word in ("shall", "must", "agrees", "required", "may terminate", "liable", "warrants")):
+        score += 25
+    if any(word in lowered for word in ("not required", "shall not", "does not apply", "for discussion only", "does not create")):
+        score -= 30
     if finding_type == "Info":
         score = min(score, 55)
     if len(matched.split()) >= 3:
