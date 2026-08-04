@@ -1,35 +1,115 @@
-# AI-Contract-Scanner
+# AI Contract Scanner
 
-A Windows desktop application designed to assist with reviewing  contracts, identifying potentially important risk language, and presenting findings in a structured format for human review.
+A Windows desktop application for analyzing PDF, DOCX, and TXT contracts, identifying potentially important clauses, calculating a structured risk score, and generating professional review reports.
 
-> **Portfolio status:** This repository is being prepared as a professional project showcase. The public documentation currently describes the verified release and handoff workflow. Application source code and screenshots will be added only after private information, client data, credentials, and generated build files have been removed.
+> **Current engine:** deterministic keyword and clause-pattern analysis with confidence scoring and OCR fallback for scanned PDFs. The application assists human review; it does not provide legal advice.
 
-## Verified capabilities
+## Core capabilities
 
-Based on the current release tooling, the project supports:
+- PDF, DOCX, and TXT document extraction
+- OCR fallback when a PDF does not contain usable embedded text
+- Configurable keyword library with aliases, categories, risk levels, finding types, and review notes
+- Built-in clause-pattern detection
+- Operative-language and negation checks to reduce obvious false positives
+- Confidence scoring and duplicate-finding reduction
+- Weighted 0–100 risk assessment with category caps
+- Low, Moderate, Elevated, High, and Critical ratings
+- Prioritized findings and practical review recommendations
+- Searchable local scan repository
+- CSV, TXT, and formatted DOCX report exports
+- Portable Windows release bundles with manifests and SHA-256 verification
+- Inno Setup installer asset generation and code-signing workflow documentation
 
-- Portable Windows delivery through `ContractReviewAssistant.exe`
-- Versioned release bundle names
-- Client-facing `START-HERE.cmd` and quick-start instructions
-- Release metadata in `RELEASE-MANIFEST.json`
-- SHA-256 checksums for individual bundle files and the final ZIP archive
-- PowerShell-based checksum verification
-- Signed and unsigned release notes
-- Automated validation of required release inputs
+## Analysis pipeline
+
+```text
+PDF / DOCX / TXT
+        │
+        ▼
+Document extraction
+        │
+        ├── Native PDF text
+        └── OCR fallback for scanned PDF pages
+        │
+        ▼
+Keyword and clause-pattern scanner
+        │
+        ├── Operative-language checks
+        ├── Negation/context checks
+        ├── Confidence assignment
+        └── Finding deduplication
+        │
+        ▼
+Risk engine
+        │
+        ├── Category weighting
+        ├── Severity and finding-type multipliers
+        ├── Category score caps
+        └── Recommendations
+        │
+        ├───────────────┬──────────────────┐
+        ▼               ▼                  ▼
+Review dashboard   Scan repository   CSV/TXT/DOCX reports
+```
+
+## Application areas
+
+The scanner is being generalized for multiple contract types, including:
+
+- General commercial agreements
+- Vendor and supplier agreements
+- Service agreements
+- Employment agreements
+- NDAs and confidentiality agreements
+- Software and licensing agreements
+- Procurement agreements
+- Lease agreements
+- Construction and subcontract agreements
+- Custom organization-specific rule libraries
+
+## Current source structure
+
+```text
+AI-Contract-Scanner/
+├── contract_review_assistant/
+│   ├── scanner.py
+│   ├── risk_engine.py
+│   ├── repository.py
+│   ├── keyword_library.py
+│   └── app_paths.py
+├── packaging/
+│   └── release_bundle.py
+├── docs/
+│   ├── architecture.md
+│   ├── installation.md
+│   ├── user-guide.md
+│   └── roadmap.md
+├── README.md
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── LICENSE
+└── .gitignore
+```
+
+The Python package retains its existing internal name temporarily to avoid breaking imports and packaging scripts during the public rebrand.
+
+## Reporting
+
+The application can produce structured reports containing:
+
+- Overall risk score and rating
+- Finding counts by type
+- Executive summary
+- Category breakdown
+- Top review priorities
+- Recommendations
+- Detailed findings with location, context, confidence, and review priority
+- Reviewer sign-off fields in DOCX output
 
 ## Release workflow
 
-The release builder:
-
-1. Reads the product version from Windows packaging metadata.
-2. Validates that the executable, documentation, and verification script exist.
-3. Creates a clean, versioned portable-release directory.
-4. Copies the required client-delivery files.
-5. Generates a launcher, quick-start guide, release manifest, and checksum manifest.
-6. Compresses the release folder into a ZIP archive.
-7. Generates a SHA-256 checksum for the completed ZIP.
-
-See [`docs/architecture.md`](docs/architecture.md) for a more detailed explanation.
+The release tooling creates versioned portable Windows bundles, generates client launch instructions, records included files in a release manifest, calculates SHA-256 checksums, and produces a verified ZIP archive. Separate installer tooling generates an Inno Setup script and signing-ready release instructions.
 
 ## Documentation
 
@@ -41,30 +121,20 @@ See [`docs/architecture.md`](docs/architecture.md) for a more detailed explanati
 - [Contributing guide](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
 
-## Planned repository structure
+## Planned v2 work
 
-```text
-AI-Contract-Review-Assistant/
-├── README.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── LICENSE
-├── SECURITY.md
-├── .gitignore
-├── docs/
-│   ├── architecture.md
-│   ├── installation.md
-│   ├── user-guide.md
-│   └── roadmap.md
-├── src/                  # Application source after security review
-├── tests/                # Automated tests after review
-├── packaging/            # Windows packaging configuration
-└── assets/               # Screenshots and project graphics
-```
+- Complete visible rebrand to **AI Contract Scanner**
+- General-purpose category names
+- Contract-type keyword-library profiles
+- Modernized dashboard and summary cards
+- Improved repository filters and reviewer notes
+- Expanded automated tests
+- CI validation through GitHub Actions
+- Optional AI-assisted explanations as a separate, clearly identified feature
 
 ## Important limitation
 
-This software assists with contract review. It does not replace legal advice, legal interpretation, or professional judgment. Findings must be reviewed by a qualified person before business or legal decisions are made.
+This software supports contract review and triage. It does not replace legal advice, legal interpretation, or professional judgment. Every finding and recommendation must be reviewed by an appropriately qualified person before a legal or business decision is made.
 
 ## Project owner
 
