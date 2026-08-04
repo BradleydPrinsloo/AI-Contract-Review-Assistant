@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in the Construction Contract Risk Scanner.
+Thank you for your interest in **AI Contract Scanner**.
 
 This repository is currently maintained as a proprietary portfolio project. External code contributions are not being accepted yet, but constructive feedback and reproducible bug reports are welcome through GitHub Issues.
 
@@ -9,13 +9,13 @@ This repository is currently maintained as a proprietary portfolio project. Exte
 Please confirm that:
 
 - The issue does not contain a real client contract or confidential business information.
-- No API keys, passwords, tokens, personal information, or proprietary rules are included.
-- The behavior can be explained using a safe demonstration file.
+- No API keys, passwords, tokens, personal information, certificates, or proprietary rules are included.
+- The behavior can be explained using a safe, non-confidential demonstration file.
 - The expected and actual behavior are clearly described.
 
 ## Suggested issue format
 
-- **Environment:** Windows version and application version
+- **Environment:** Windows version, Python version when applicable, and application version
 - **Steps to reproduce:** Numbered steps
 - **Expected behavior:** What should have happened
 - **Actual behavior:** What happened instead
