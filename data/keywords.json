@@ -1,0 +1,82 @@
+[
+  {
+    "phrase": "unlimited liability",
+    "aliases": ["liability shall be unlimited"],
+    "category": "Liability Allocation",
+    "risk": "Critical",
+    "finding_type": "Risk",
+    "note": "Review for uncapped financial exposure and applicable carve-outs."
+  },
+  {
+    "phrase": "indemnify",
+    "aliases": ["indemnification", "hold harmless", "defend and indemnify"],
+    "category": "Indemnification",
+    "risk": "High",
+    "finding_type": "Risk",
+    "note": "Review the scope of defense and indemnity obligations."
+  },
+  {
+    "phrase": "automatic renewal",
+    "aliases": ["automatically renew", "renews automatically", "auto-renewal"],
+    "category": "Term / Renewal",
+    "risk": "Medium",
+    "finding_type": "Risk",
+    "note": "Confirm renewal terms and the required non-renewal notice period."
+  },
+  {
+    "phrase": "termination for convenience",
+    "aliases": ["terminate for convenience"],
+    "category": "Termination Risk",
+    "risk": "High",
+    "finding_type": "Risk",
+    "note": "Review notice, payment, transition, and termination-cost provisions."
+  },
+  {
+    "phrase": "payment due",
+    "aliases": ["net 30", "net 60", "net 90", "pay when paid", "pay-if-paid"],
+    "category": "Payment Terms",
+    "risk": "Medium",
+    "finding_type": "Risk",
+    "note": "Review payment timing, conditions, deductions, and release triggers."
+  },
+  {
+    "phrase": "governing law",
+    "aliases": ["exclusive jurisdiction", "venue shall be"],
+    "category": "Governing Law",
+    "risk": "Low",
+    "finding_type": "Info",
+    "note": "Confirm the selected law, forum, and dispute-resolution process."
+  },
+  {
+    "phrase": "confidential information",
+    "aliases": ["confidentiality obligations", "non-disclosure"],
+    "category": "Confidentiality",
+    "risk": "Medium",
+    "finding_type": "Neutral",
+    "note": "Review the definition, exclusions, permitted disclosures, and duration."
+  },
+  {
+    "phrase": "limitation of liability",
+    "aliases": ["liability cap", "aggregate liability"],
+    "category": "Liability Allocation",
+    "risk": "Low",
+    "finding_type": "Protective",
+    "note": "Confirm the cap, exclusions, and whether the limitation applies mutually."
+  },
+  {
+    "phrase": "service level",
+    "aliases": ["service levels", "service credit", "uptime commitment"],
+    "category": "Service / Performance",
+    "risk": "Medium",
+    "finding_type": "Neutral",
+    "note": "Review performance metrics, measurement, remedies, and exclusions."
+  },
+  {
+    "phrase": "non-compete",
+    "aliases": ["restrictive covenant", "competing business"],
+    "category": "Employment",
+    "risk": "High",
+    "finding_type": "Risk",
+    "note": "Review duration, geography, restricted activities, and enforceability with qualified counsel."
+  }
+]
