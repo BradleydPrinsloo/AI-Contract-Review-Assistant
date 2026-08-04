@@ -25,11 +25,13 @@ env/
 build/
 dist/
 release/
-*.spec
 *.exe
 *.msi
 *.zip
 *.sha256
+
+# Keep the validated PyInstaller .spec file in source control for reproducible builds.
+# Do not add *.spec here unless a generated/private spec is introduced later.
 
 # Application-generated data
 logs/
