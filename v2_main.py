@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 
 import main as desktop
 from service_main import ServiceBackedContractScannerApp
+from contract_review_assistant.branding import PRODUCT_NAME, PRODUCT_VERSION
 
 
 class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
@@ -24,7 +25,7 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
 
     NAV_ITEMS = (
         ("Dashboard", "Operational overview and current contract review."),
-        ("Contracts", "Open, analyze, and review contracts."),
+        ("Contracts", "Open, scan, and review contracts."),
         ("Repository", "Search and reopen prior contract analyses."),
         ("Clause Library", "Manage clause taxonomy and approved language."),
         ("Playbooks", "Define organization-specific review standards."),
@@ -36,7 +37,7 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
 
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Contract Intelligence Platform — Version 2")
+        self.setWindowTitle(f"{PRODUCT_NAME} Platform — Version 2")
         self.resize(1760, 1020)
         self._install_enterprise_shell()
 
@@ -94,9 +95,9 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
         layout.setContentsMargins(16, 22, 16, 18)
         layout.setSpacing(6)
 
-        brand = QLabel("Contract Intelligence")
+        brand = QLabel(PRODUCT_NAME)
         brand.setObjectName("platformBrand")
-        version = QLabel("PLATFORM V2")
+        version = QLabel(f"PLATFORM V2 · {PRODUCT_VERSION}")
         version.setObjectName("platformVersion")
         layout.addWidget(brand)
         layout.addWidget(version)
@@ -118,7 +119,7 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
         self.nav_buttons[0].setChecked(True)
         layout.addStretch()
 
-        status = QLabel("Local-first contract intelligence\nDecision-support platform")
+        status = QLabel(f"{PRODUCT_NAME} local-first intelligence\nDecision-support platform")
         status.setWordWrap(True)
         status.setStyleSheet("color:#64748b;font-size:10px;")
         layout.addWidget(status)
@@ -190,8 +191,11 @@ def main() -> None:
     app = QApplication(sys.argv)
     if desktop.APP_ICON_PATH.exists():
         app.setWindowIcon(QIcon(str(desktop.APP_ICON_PATH)))
+    splash = desktop.show_startup_splash(app)
     window = VersionTwoContractPlatform()
     window.show()
+    if splash:
+        splash.finish(window)
     raise SystemExit(app.exec())
 
 

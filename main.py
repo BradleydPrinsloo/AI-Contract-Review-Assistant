@@ -7,23 +7,34 @@ from datetime import datetime
 from pathlib import Path
 
 from PySide6.QtCore import QObject, Qt, QThread, Signal, Slot
-from PySide6.QtGui import QColor, QIcon
+from PySide6.QtGui import QColor, QIcon, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QAbstractItemView, QComboBox, QDialog, QFileDialog, QFrame,
     QGridLayout, QHBoxLayout, QHeaderView, QLabel, QLineEdit, QMainWindow,
-    QMessageBox, QProgressBar, QPushButton, QSplitter, QTableWidget,
+    QMessageBox, QProgressBar, QPushButton, QSplitter, QSplashScreen, QTableWidget,
     QTableWidgetItem, QTextEdit, QVBoxLayout, QWidget,
 )
 
 from contract_review_assistant.ai_notes import openai_summary
 from contract_review_assistant.app_paths import default_exports_dir, default_repository_dir, external_or_bundled_path
+from contract_review_assistant.branding import (
+    APP_ICON_FILENAME,
+    APP_SPLASH_FILENAME,
+    DECISION_SUPPORT_NOTICE,
+    PRODUCT_DESCRIPTION,
+    PRODUCT_NAME,
+    PRODUCT_TAGLINE,
+    PRODUCT_VERSION,
+    REPORT_SUMMARY_TITLE,
+)
 from contract_review_assistant.keyword_library import ensure_editable_keyword_library
 from contract_review_assistant.repository import load_repository_entries, record_scan, search_repository
 from contract_review_assistant.risk_engine import calculate_risk_assessment
 from contract_review_assistant.scanner import export_csv, export_docx, export_txt, extract_document, load_keywords, scan_chunks
 
-APP_TITLE = "AI Contract Scanner"
-APP_ICON_PATH = external_or_bundled_path("assets", "ai_contract_scanner.ico")
+APP_TITLE = PRODUCT_NAME
+APP_ICON_PATH = external_or_bundled_path("assets", APP_ICON_FILENAME)
+APP_SPLASH_PATH = external_or_bundled_path("assets", APP_SPLASH_FILENAME)
 KEYWORD_SOURCE = external_or_bundled_path("data", "keywords.json")
 EXPORTS_DIR = default_exports_dir()
 REPOSITORY_DIR = default_repository_dir(exports_dir=EXPORTS_DIR)
@@ -161,16 +172,16 @@ class ContractScannerApp(QMainWindow):
         """)
         root = QWidget(); layout = QVBoxLayout(root); layout.setContentsMargins(20,18,20,16); layout.setSpacing(12)
         header = QHBoxLayout(); text = QVBoxLayout()
-        title = QLabel("AI Contract Scanner"); title.setStyleSheet("font-size:30px;font-weight:900;")
-        subtitle = QLabel("Professional contract analysis with contextual scoring, OCR fallback, reports, and optional AI-assisted summaries."); subtitle.setStyleSheet("color:#94a3b8;font-size:14px;")
+        title = QLabel(PRODUCT_NAME); title.setStyleSheet("font-size:30px;font-weight:900;")
+        subtitle = QLabel(PRODUCT_TAGLINE); subtitle.setStyleSheet("color:#94a3b8;font-size:14px;")
         text.addWidget(title); text.addWidget(subtitle); header.addLayout(text,1)
         self.status_badge = QLabel("READY"); self.status_badge.setAlignment(Qt.AlignCenter); self.status_badge.setFixedWidth(120)
         self.status_badge.setStyleSheet("background:#1e293b;color:#93c5fd;border:1px solid #334155;border-radius:14px;padding:7px;font-weight:800;")
         header.addWidget(self.status_badge); layout.addLayout(header)
         actions = QHBoxLayout()
-        self.open_btn=QPushButton("Open Contract"); self.analyze_btn=QPushButton("Analyze Contract"); self.summary_btn=QPushButton("Expand Summary")
-        self.repository_btn=QPushButton("Repository"); self.docx_btn=QPushButton("Export Word"); self.csv_btn=QPushButton("Export CSV"); self.txt_btn=QPushButton("Export Text")
-        for b in (self.open_btn,self.analyze_btn,self.summary_btn,self.repository_btn,self.docx_btn,self.csv_btn,self.txt_btn): actions.addWidget(b)
+        self.open_btn=QPushButton("Open Contract"); self.analyze_btn=QPushButton("Scan Contract"); self.summary_btn=QPushButton("Expand Summary")
+        self.repository_btn=QPushButton("Repository"); self.docx_btn=QPushButton("Export Word"); self.csv_btn=QPushButton("Export CSV"); self.txt_btn=QPushButton("Export Text"); self.about_btn=QPushButton("About")
+        for b in (self.open_btn,self.analyze_btn,self.summary_btn,self.repository_btn,self.docx_btn,self.csv_btn,self.txt_btn,self.about_btn): actions.addWidget(b)
         actions.addStretch(); layout.addLayout(actions)
         cards=QGridLayout(); cards.setHorizontalSpacing(10)
         self.score_frame,self.score_value,_=self.make_card("Overall Risk","—")
@@ -193,16 +204,16 @@ class ContractScannerApp(QMainWindow):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive); self.table.horizontalHeader().setStretchLastSection(True); self.table.verticalHeader().setVisible(False); ll.addWidget(self.table,1)
         right=QFrame(); right.setMinimumWidth(430); right.setStyleSheet("QFrame{background:#0f172a;border:1px solid #263449;border-radius:10px;}"); rl=QVBoxLayout(right)
         sh=QLabel("Executive Summary"); sh.setStyleSheet("font-size:18px;font-weight:900;border:0;")
-        self.summary_view=QTextEdit(); self.summary_view.setReadOnly(True); self.summary_view.setHtml(self.format_summary_html("Open and analyze a contract to display the executive summary here."))
+        self.summary_view=QTextEdit(); self.summary_view.setReadOnly(True); self.summary_view.setHtml(self.format_summary_html("Open and scan a contract to display the executive summary here."))
         dh=QLabel("Selected Finding"); dh.setStyleSheet("font-size:16px;font-weight:900;border:0;margin-top:6px;")
         self.detail_view=QTextEdit(); self.detail_view.setReadOnly(True); self.detail_view.setMaximumHeight(230); self.detail_view.setPlainText("Select a finding row to inspect its full context and review guidance.")
         self.false_positive_btn=QPushButton("Mark Selected as False Positive"); self.false_positive_btn.setEnabled(False)
         rl.addWidget(sh); rl.addWidget(self.summary_view,2); rl.addWidget(dh); rl.addWidget(self.detail_view,1); rl.addWidget(self.false_positive_btn)
         splitter.addWidget(left); splitter.addWidget(right); splitter.setSizes([1050,500]); layout.addWidget(splitter,1)
-        footer=QLabel("Decision-support tool only. Results require qualified human review and do not constitute legal advice."); footer.setStyleSheet("color:#94a3b8;"); layout.addWidget(footer)
+        footer=QLabel(DECISION_SUPPORT_NOTICE); footer.setStyleSheet("color:#94a3b8;"); layout.addWidget(footer)
         self.setCentralWidget(root)
         self.open_btn.clicked.connect(self.open_contract); self.analyze_btn.clicked.connect(self.analyze_contract); self.summary_btn.clicked.connect(self.show_summary)
-        self.repository_btn.clicked.connect(self.open_repository); self.docx_btn.clicked.connect(self.export_docx_report); self.csv_btn.clicked.connect(self.export_csv_report); self.txt_btn.clicked.connect(self.export_txt_report)
+        self.repository_btn.clicked.connect(self.open_repository); self.docx_btn.clicked.connect(self.export_docx_report); self.csv_btn.clicked.connect(self.export_csv_report); self.txt_btn.clicked.connect(self.export_txt_report); self.about_btn.clicked.connect(self.show_about)
         self.search_box.textChanged.connect(self.apply_filters); self.risk_filter.currentTextChanged.connect(self.apply_filters); self.table.itemSelectionChanged.connect(self.show_selected_finding)
         self.false_positive_btn.clicked.connect(self.mark_false_positive); self.set_actions_enabled(False)
 
@@ -222,7 +233,7 @@ class ContractScannerApp(QMainWindow):
     def open_contract(self):
         path,_=QFileDialog.getOpenFileName(self,"Open Contract",str(Path.home()),"Contract Files (*.pdf *.docx *.txt)")
         if not path:return
-        self.current_file=path; self.contract_value.setText(Path(path).name); self.status.setText("Contract selected. Ready to analyze."); self.status_badge.setText("READY"); self.progress.setValue(0)
+        self.current_file=path; self.contract_value.setText(Path(path).name); self.status.setText("Contract selected. Ready to scan."); self.status_badge.setText("READY"); self.progress.setValue(0)
         self.clear_results(); self.set_actions_enabled(False)
 
     def clear_results(self):
@@ -307,7 +318,7 @@ class ContractScannerApp(QMainWindow):
     @staticmethod
     def format_summary_html(text):
         safe=html.escape(text or "No summary available.")
-        safe=safe.replace("Contract Analysis Summary","<h2>Contract Analysis Summary</h2>").replace("Top review priorities:","<h3>Top Review Priorities</h3>").replace("Recommended actions:","<h3>Recommended Actions</h3>").replace("Disclaimer:","<h3>Disclaimer</h3>")
+        safe=safe.replace(REPORT_SUMMARY_TITLE,f"<h2>{REPORT_SUMMARY_TITLE}</h2>").replace("Top review priorities:","<h3>Top Review Priorities</h3>").replace("Recommended actions:","<h3>Recommended Actions</h3>").replace("Disclaimer:","<h3>Disclaimer</h3>")
         lines=[]
         for line in safe.splitlines():
             stripped=line.strip()
@@ -316,6 +327,9 @@ class ContractScannerApp(QMainWindow):
             elif stripped.startswith("-"): lines.append(f"<li>{stripped[1:].strip()}</li>")
             else: lines.append(f"<p>{stripped}</p>")
         return "".join(lines)
+
+    def show_about(self):
+        QMessageBox.about(self,f"About {PRODUCT_NAME}",f"<h2>{PRODUCT_NAME}</h2><p><b>Version {PRODUCT_VERSION}</b></p><p>{PRODUCT_TAGLINE}</p><p>{PRODUCT_DESCRIPTION}</p><p>{DECISION_SUPPORT_NOTICE}</p>")
 
     def show_summary(self): SummaryDialog(self,self.format_summary_html(self.summary)).exec()
     def open_repository(self): self.repository_dialog.refresh(); self.repository_dialog.show(); self.repository_dialog.raise_()
@@ -335,12 +349,23 @@ class ContractScannerApp(QMainWindow):
         path,_=QFileDialog.getSaveFileName(self,"Save Text Report",str(EXPORTS_DIR/self.default_report_name("txt")),"Text Files (*.txt)")
         if path: export_txt(self.results,self.current_file or "",path,self.assessment,self.summary)
     @staticmethod
-    def default_report_name(extension): return f"contract_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{extension}"
+    def default_report_name(extension): return f"contractiq_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{extension}"
+
+
+def show_startup_splash(app):
+    if not APP_SPLASH_PATH.exists(): return None
+    pixmap=QPixmap(str(APP_SPLASH_PATH))
+    if pixmap.isNull(): return None
+    splash=QSplashScreen(pixmap)
+    splash.showMessage(f"{PRODUCT_NAME} {PRODUCT_VERSION}",Qt.AlignBottom | Qt.AlignCenter,QColor("#dbeafe"))
+    splash.show(); app.processEvents(); return splash
 
 
 def main():
     app=QApplication(sys.argv)
     if APP_ICON_PATH.exists(): app.setWindowIcon(QIcon(str(APP_ICON_PATH)))
-    window=ContractScannerApp(); window.show(); raise SystemExit(app.exec())
+    splash=show_startup_splash(app); window=ContractScannerApp(); window.show()
+    if splash: splash.finish(window)
+    raise SystemExit(app.exec())
 
 if __name__=="__main__": main()

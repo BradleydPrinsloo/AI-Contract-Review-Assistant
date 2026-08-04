@@ -55,14 +55,14 @@ class ReportDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Generate Contract Report")
+        self.setWindowTitle("Generate ContractIQ Report")
         self.setMinimumWidth(480)
 
         layout = QVBoxLayout(self)
-        heading = QLabel("Generate Report")
+        heading = QLabel("Generate ContractIQ Report")
         heading.setStyleSheet("font-size:22px;font-weight:900;")
         description = QLabel(
-            "Choose the report audience, output format, and sections to include."
+            "Choose the ContractIQ report audience, output format, and sections to include."
         )
         description.setWordWrap(True)
         description.setStyleSheet("color:#94a3b8;")
@@ -140,7 +140,7 @@ class ServiceBackedContractScannerApp(desktop.ContractScannerApp):
         self.set_actions_enabled(self.assessment is not None)
 
     def _install_report_workflow(self) -> None:
-        self.summary_btn.setText("Executive Summary")
+        self.summary_btn.setText("ContractIQ Summary")
 
         # CSV and TXT remain available in the engine for integrations, but are
         # intentionally removed from the business-user interface.
@@ -216,7 +216,7 @@ class ServiceBackedContractScannerApp(desktop.ContractScannerApp):
     def generate_report(self) -> None:
         if self.assessment is None:
             QMessageBox.information(
-                self, "No Analysis", "Analyze or load a contract before generating a report."
+                self, "No Analysis", "Scan or load a contract before generating a report."
             )
             return
 
@@ -227,9 +227,9 @@ class ServiceBackedContractScannerApp(desktop.ContractScannerApp):
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         prefix = (
-            "executive_contract_summary"
+            "contractiq_executive_brief"
             if options["report_type"] == "executive"
-            else "contract_analysis_report"
+            else "contractiq_analysis_report"
         )
         extension = options["output_format"]
         default_path = desktop.EXPORTS_DIR / f"{prefix}_{timestamp}.{extension}"
@@ -239,7 +239,7 @@ class ServiceBackedContractScannerApp(desktop.ContractScannerApp):
             else "Word Documents (*.docx)"
         )
         output_path, _ = QFileDialog.getSaveFileName(
-            self, "Save Contract Report", str(default_path), file_filter
+            self, "Save ContractIQ Report", str(default_path), file_filter
         )
         if not output_path:
             return
@@ -291,8 +291,11 @@ def main() -> None:
     app = QApplication(sys.argv)
     if desktop.APP_ICON_PATH.exists():
         app.setWindowIcon(QIcon(str(desktop.APP_ICON_PATH)))
+    splash = desktop.show_startup_splash(app)
     window = ServiceBackedContractScannerApp()
     window.show()
+    if splash:
+        splash.finish(window)
     raise SystemExit(app.exec())
 
 

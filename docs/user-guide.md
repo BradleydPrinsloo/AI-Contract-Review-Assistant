@@ -2,21 +2,22 @@
 
 ## Purpose
 
-The Construction Contract Risk Scanner is designed to assist a user with reviewing contract language and organizing findings for human evaluation.
+ContractIQ is designed to assist a user with reviewing contract language, organizing findings, and producing a clear report for human evaluation.
 
 It is a support tool. It does not provide legal advice and should not be treated as a substitute for review by a qualified professional.
 
 ## Basic workflow
 
-1. Launch the application with `START-HERE.cmd`.
+1. Launch the application with `START-HERE.cmd` or `python main.py` during development.
 2. Select **Open Contract**.
 3. Choose a contract that you are authorized to review.
 4. Select **Scan Contract**.
 5. Review the displayed risk score, findings, and summary.
+6. Use **About** to confirm the ContractIQ version and decision-support notice.
 
 ## Using your own document
 
-The verified quick-start documentation indicates support for PDF, DOCX, and TXT contracts.
+ContractIQ supports PDF, DOCX, and TXT contracts.
 
 Before opening a document:
 

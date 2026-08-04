@@ -8,6 +8,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Iterable
 
+from .branding import DECISION_SUPPORT_NOTICE, REPORT_FULL_TITLE
+
 
 @dataclass
 class ScanResult:
@@ -166,10 +168,10 @@ def export_csv(results: Iterable[ScanResult], output_path: str | Path, source_fi
 
 def export_txt(results: Iterable[ScanResult], source_file: str, output_path: str | Path, risk_assessment, summary_text: str = "") -> Path:
     output = Path(output_path)
-    lines = ["Contract Analysis Report", "========================", f"Source file: {source_file}", f"Generated: {datetime.now().isoformat(timespec='seconds')}", f"Overall Risk Score: {risk_assessment.total_score}/100", f"Risk Rating: {risk_assessment.rating}", f"Finding Count: {risk_assessment.finding_count}", f"Risk Findings: {risk_assessment.risk_count}", f"Protective Findings: {risk_assessment.protective_count}", f"Neutral/Info Findings: {risk_assessment.neutral_count}", "", summary_text.strip(), "", "Detailed findings", "-----------------"]
+    lines = [REPORT_FULL_TITLE, "========================", f"Source file: {source_file}", f"Generated: {datetime.now().isoformat(timespec='seconds')}", f"Overall Risk Score: {risk_assessment.total_score}/100", f"Risk Rating: {risk_assessment.rating}", f"Finding Count: {risk_assessment.finding_count}", f"Risk Findings: {risk_assessment.risk_count}", f"Protective Findings: {risk_assessment.protective_count}", f"Neutral/Info Findings: {risk_assessment.neutral_count}", "", summary_text.strip(), "", "Detailed findings", "-----------------"]
     for index, item in enumerate(results, 1):
         lines.extend([f"{index}. {item.phrase} [{item.finding_type}/{item.risk}]", f"Category: {item.category}", f"Location: {item.location}", f"Score: {item.score} | Confidence: {item.confidence}%", f"Note: {item.note}", f"Context: {item.context}", ""])
-    lines.append("Disclaimer: This report supports human review and is not legal advice.")
+    lines.append(f"Disclaimer: {DECISION_SUPPORT_NOTICE}")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("\n".join(lines), encoding="utf-8")
     return output
@@ -180,7 +182,7 @@ def export_docx(results: Iterable[ScanResult], source_file: str, output_path: st
     from docx.shared import Pt
     output = Path(output_path)
     document = Document()
-    document.add_heading("Contract Analysis Report", 0)
+    document.add_heading(REPORT_FULL_TITLE, 0)
     document.add_paragraph(f"Source: {source_file}")
     document.add_paragraph(f"Generated: {datetime.now().isoformat(timespec='seconds')}")
     document.add_heading("Risk Overview", level=1)
@@ -195,7 +197,7 @@ def export_docx(results: Iterable[ScanResult], source_file: str, output_path: st
         document.add_paragraph(f"Location: {item.location}")
         document.add_paragraph(f"Review note: {item.note}")
         document.add_paragraph(item.context)
-    disclaimer = document.add_paragraph("This report supports human review and does not provide legal advice.")
+    disclaimer = document.add_paragraph(DECISION_SUPPORT_NOTICE)
     for run in disclaimer.runs:
         run.font.size = Pt(9)
     output.parent.mkdir(parents=True, exist_ok=True)

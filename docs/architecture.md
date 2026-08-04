@@ -2,7 +2,7 @@
 
 ## Overview
 
-AI Contract Scanner is a modular Windows desktop application that separates document extraction, rule evaluation, risk scoring, optional AI summarization, local persistence, reporting, and release packaging.
+ContractIQ is a modular Windows desktop application that separates document extraction, rule evaluation, risk scoring, optional AI summarization, local persistence, reporting, branding, and release packaging.
 
 ## Application pipeline
 
@@ -33,30 +33,47 @@ Risk engine
         ├── Category caps
         └── Recommendations
         │
-        ├──────────────┬────────────────┬──────────────────┐
-        ▼              ▼                ▼                  ▼
-Desktop UI       Local repository   CSV/TXT/DOCX     Optional AI
-                                      reports          summary
+        ├──────────────┬────────────────┬──────────────────┬──────────────┐
+        ▼              ▼                ▼                  ▼              ▼
+Desktop UI       Local repository   CSV/TXT/PDF/DOCX  Brand assets   Optional AI
+                                      reports           + metadata     summary
 ```
 
 ## Main components
 
-- `main.py` — PySide6 desktop interface, background scan worker, findings table, summaries, repository browser, and exports
-- `contract_review_assistant/scanner.py` — document extraction, OCR fallback, clause scanning, confidence handling, deduplication, and report generation
+- `main.py` — PySide6 desktop interface, startup splash, About dialog, background scan worker, findings table, summaries, repository browser, and exports
+- `service_main.py` — service-backed desktop entry point with report-generation workflow
+- `v2_main.py` — Version 2 platform shell and navigation foundation
+- `contract_review_assistant/branding.py` — ContractIQ product constants, report titles, executable naming, and decision-support notices
+- `contract_review_assistant/scanner.py` — document extraction, OCR fallback, clause scanning, confidence handling, deduplication, and simple report generation
+- `contract_review_assistant/reporting.py` — branded HTML/PDF/DOCX report templates
 - `contract_review_assistant/risk_engine.py` — weighted scoring, ratings, top findings, and recommendations
 - `contract_review_assistant/repository.py` — JSON scan records, legacy-report import, searching, and report-path updates
 - `contract_review_assistant/keyword_library.py` — editable rule-library creation, normalization, and persistence
 - `contract_review_assistant/ai_notes.py` — optional OpenAI summary with a deterministic local fallback
 - `contract_review_assistant/app_paths.py` — development, packaged-build, export, and repository paths
-- `contract_review_assistant/release_bundle.py` — portable release bundle, manifest, ZIP, and SHA-256 generation
-- `contract_review_assistant/release_installer.py` — Inno Setup asset generation and signing-ready instructions
+- `packaging/release_bundle.py` — portable release bundle, manifest, ZIP, and SHA-256 generation
+- `packaging/windows/file_version_info.txt` — Windows version metadata for `ContractIQ.exe`
+
+## Brand assets
+
+```text
+assets/
+├── contractiq_logo.svg
+├── contractiq_icon.svg
+├── contractiq_icon.png
+├── contractiq.ico
+└── contractiq_splash.png
+```
+
+The Qt app uses `contractiq.ico` for the window/application icon and `contractiq_splash.png` for the startup splash screen when the asset is present.
 
 ## Local storage
 
 Packaged builds use:
 
 ```text
-Documents\AI Contract Scanner Exports\
+Documents\ContractIQ Exports\
 ├── keyword-library\keywords.json
 └── repository\*.json
 ```
@@ -70,10 +87,10 @@ AI assistance is optional. When `OPENAI_API_KEY` is unavailable or an API reques
 ## Release pipeline
 
 ```text
-Windows version metadata
+ContractIQ brand assets + Windows version metadata
           │
           ▼
-Build AIContractScanner.exe
+Build ContractIQ.exe
           │
           ▼
 Validate release inputs
@@ -89,9 +106,6 @@ Create versioned portable bundle
           │
           ▼
 Create verified ZIP archive
-          │
-          ▼
-Generate optional Inno Setup installer assets
 ```
 
 ## Integrity controls
@@ -107,4 +121,4 @@ The release tooling supports:
 
 ## Security boundary
 
-The public repository excludes credentials, `.env` files, private contracts, client databases, generated reports, executables, installers, and release archives. The application supports internal contract review and does not provide legal advice.
+The public repository excludes credentials, `.env` files, private contracts, client databases, generated reports, executables, installers, and release archives. ContractIQ supports internal contract review and does not provide legal advice.

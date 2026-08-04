@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in **AI Contract Scanner**.
+Thank you for your interest in **ContractIQ**.
 
 This repository is currently maintained as a proprietary portfolio project. External code contributions are not being accepted yet, but constructive feedback and reproducible bug reports are welcome through GitHub Issues.
 

@@ -8,6 +8,8 @@ The format follows the principles of Keep a Changelog. Version numbers will be a
 
 ### Added
 
+- ContractIQ product logo, Windows icon, startup splash screen, and central branding constants
+- Branded Qt About dialog, report titles, version metadata, and release handoff documents
 - Professional repository overview
 - Architecture, installation, user-guide, and roadmap documentation
 - Security and contribution policies

@@ -1,14 +1,14 @@
-# AI Contract Scanner
+# ContractIQ
 
-A Windows desktop application for analyzing PDF, DOCX, and TXT contracts, identifying potentially important clauses, calculating a structured risk score, and generating professional review reports.
+ContractIQ is a Windows desktop contract-intelligence application for analyzing PDF, DOCX, and TXT contracts, identifying important clauses, calculating an explainable risk score, and generating professional review reports.
 
-> **Current engine:** deterministic keyword and clause-pattern analysis with confidence scoring and OCR fallback for scanned PDFs. Optional AI summaries are available when configured. The application assists human review; it does not provide legal advice.
+> **Current engine:** deterministic keyword and clause-pattern analysis with confidence scoring and OCR fallback for scanned PDFs. Optional AI summaries are available when configured. ContractIQ assists human review; it does not provide legal advice.
 
-## Project status
+## Rebrand status
 
-**Phase 1 complete:** the product, interface, report branding, Windows metadata, export paths, release naming, and AI prompts have been generalized under the **AI Contract Scanner** name.
+**ContractIQ identity complete:** the product name, Qt window title, dashboard header, app icon, startup splash, report headers, Windows version metadata, release naming, and documentation now use the ContractIQ brand.
 
-**Next phase:** modern dashboard redesign, summary cards, contract-type rule profiles, improved repository filters, automated tests, and CI validation.
+**Next phase:** continue the Version 2 platform build with deeper clause-library management, playbooks, repository filters, reviewer notes, analytics, and reproducible Windows packaging.
 
 ## Core capabilities
 
@@ -22,10 +22,10 @@ A Windows desktop application for analyzing PDF, DOCX, and TXT contracts, identi
 - Low, Moderate, Elevated, High, and Critical ratings
 - Prioritized findings and practical review recommendations
 - Searchable local scan repository
-- CSV, TXT, and formatted DOCX report exports
+- CSV, TXT, PDF, and formatted DOCX report exports
 - Rule-based summaries with optional OpenAI assistance
-- Portable Windows release bundles with manifests and SHA-256 verification
-- Inno Setup installer asset generation and code-signing workflow documentation
+- Portable Windows release bundle tooling with manifests and SHA-256 verification
+- Branded Windows metadata for `ContractIQ.exe`
 
 ## Analysis pipeline
 
@@ -54,15 +54,15 @@ Risk engine
         ├── Category score caps
         └── Recommendations
         │
-        ├───────────────┬──────────────────┬─────────────────┐
-        ▼               ▼                  ▼                 ▼
-Review dashboard   Scan repository   CSV/TXT/DOCX     Optional AI
-                                        reports          summary
+        ├───────────────┬──────────────────┬────────────────────┬─────────────┐
+        ▼               ▼                  ▼                    ▼             ▼
+Review dashboard   Scan repository   CSV/TXT/PDF/DOCX      Splash/About   Optional AI
+                                        reports              branding       summary
 ```
 
 ## Application areas
 
-The scanner is designed to support rule libraries for multiple contract types, including:
+ContractIQ is designed to support rule libraries for multiple contract types, including:
 
 - General commercial agreements
 - Vendor and supplier agreements
@@ -79,38 +79,51 @@ The scanner is designed to support rule libraries for multiple contract types, i
 
 ```text
 AI-Contract-Scanner/
+├── assets/
+│   ├── contractiq_logo.svg
+│   ├── contractiq_icon.svg
+│   ├── contractiq_icon.png
+│   ├── contractiq.ico
+│   └── contractiq_splash.png
 ├── main.py
+├── service_main.py
+├── v2_main.py
 ├── contract_review_assistant/
+│   ├── branding.py
 │   ├── ai_notes.py
 │   ├── app_paths.py
+│   ├── application_service.py
 │   ├── keyword_library.py
+│   ├── reporting.py
 │   ├── repository.py
 │   ├── risk_engine.py
-│   ├── scanner.py
-│   ├── release_bundle.py
-│   └── release_installer.py
+│   └── scanner.py
 ├── packaging/
+│   ├── release_bundle.py
 │   └── windows/
-│       └── file_version_info.txt
+│       ├── file_version_info.txt
+│       └── VERIFY-CHECKSUMS.ps1
 ├── docs/
-│   ├── architecture.md
-│   ├── installation.md
-│   ├── user-guide.md
-│   └── roadmap.md
+├── tests/
+├── README-FIRST.md
+├── CLIENT-HANDOFF.md
+├── RELEASE-NOTES.md
 ├── requirements.txt
-├── README.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── SECURITY.md
-├── LICENSE
-└── .gitignore
+└── README.md
 ```
 
 The Python package retains its existing internal name temporarily to avoid breaking imports and packaging scripts during the public rebrand.
 
+## Branding assets
+
+- **Logo:** `assets/contractiq_logo.svg`
+- **Application icon:** `assets/contractiq.ico` and `assets/contractiq_icon.png`
+- **Startup splash:** `assets/contractiq_splash.png`
+- **Windows metadata:** `packaging/windows/file_version_info.txt`
+
 ## Reporting
 
-The application can produce structured reports containing:
+ContractIQ reports can contain:
 
 - Overall risk score and rating
 - Finding counts by type
@@ -120,34 +133,25 @@ The application can produce structured reports containing:
 - Recommendations
 - Detailed findings with location, context, confidence, and review priority
 - Reviewer sign-off fields in DOCX output
+- ContractIQ decision-support notice
 
 ## Release workflow
 
-The release tooling creates versioned portable Windows bundles, generates launch instructions, records included files in a release manifest, calculates SHA-256 checksums, and produces a verified ZIP archive. Separate installer tooling generates an Inno Setup script and signing-ready release instructions.
+The release tooling creates versioned portable Windows bundles, generates launch instructions, records included files in a release manifest, calculates SHA-256 checksums, and produces a verified ZIP archive. `packaging/windows/file_version_info.txt` stamps the branded executable metadata for PyInstaller builds.
 
 ## Documentation
 
 - [Architecture](docs/architecture.md)
 - [Installation and release use](docs/installation.md)
 - [User guide](docs/user-guide.md)
-- [Roadmap](docs/roadmap.md)
+- [Platform roadmap](docs/platform-roadmap.md)
 - [Security policy](SECURITY.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
 
-## Phase 2 roadmap
-
-- Modernized dashboard and summary cards
-- Contract-type keyword-library profiles
-- Improved repository filters and reviewer notes
-- Expanded automated tests
-- CI validation through GitHub Actions
-- Sanitized screenshots and release documentation
-- Reproducible Windows build configuration
-
 ## Important limitation
 
-This software supports contract review and triage. It does not replace legal advice, legal interpretation, or professional judgment. Every finding and recommendation must be reviewed by an appropriately qualified person before a legal or business decision is made.
+ContractIQ supports contract review and triage. It does not replace legal advice, legal interpretation, or professional judgment. Every finding and recommendation must be reviewed by an appropriately qualified person before a legal or business decision is made.
 
 ## Project owner
 

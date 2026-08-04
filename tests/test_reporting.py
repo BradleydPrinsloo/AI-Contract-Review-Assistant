@@ -40,11 +40,11 @@ def test_executive_report_emphasizes_priority_items():
         _findings(),
         "sample_contract.pdf",
         _assessment(),
-        "Contract Analysis Summary\nRecommended actions:\n- Review indemnity.",
+        "ContractIQ Analysis Summary\nRecommended actions:\n- Review indemnity.",
         report_type="executive",
     )
 
-    assert "Executive Contract Risk Summary" in report
+    assert "ContractIQ Executive Risk Brief" in report
     assert "Priority Review Items" in report
     assert "sample_contract.pdf" in report
     assert "indemnify" in report
@@ -57,13 +57,14 @@ def test_full_report_includes_detailed_findings():
         _findings(),
         "sample_contract.pdf",
         _assessment(),
-        "Contract Analysis Summary",
+        "ContractIQ Analysis Summary",
         report_type="full",
         include_findings=True,
     )
 
-    assert "Contract Analysis Report" in report
+    assert "ContractIQ Contract Analysis Report" in report
     assert "Detailed Findings" in report
     assert "Indemnification" in report
     assert "Liability Allocation" in report
     assert "Decision-support notice" in report
+    assert "ContractIQ" in report

@@ -3,10 +3,11 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from .branding import APP_EXPORTS_DIRNAME, LEGACY_EXPORTS_DIRNAMES
 
-APP_EXPORTS_DIRNAME = "AI Contract Scanner Exports"
+
 APP_REPOSITORY_DIRNAME = "repository"
-LEGACY_EXPORTS_DIRNAME = "Contract Review Assistant Exports"
+LEGACY_EXPORTS_DIRNAME = LEGACY_EXPORTS_DIRNAMES[0]
 
 
 def project_root() -> Path:

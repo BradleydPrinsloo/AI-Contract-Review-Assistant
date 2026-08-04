@@ -10,10 +10,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from contract_review_assistant.app_paths import project_root as default_project_root
+from contract_review_assistant.branding import APP_EXPORTS_DIRNAME, PRODUCT_NAME, PRODUCT_SLUG, WINDOWS_EXE_NAME
 
-APP_NAME = "Construction Contract Risk Scanner"
-APP_SLUG = "construction-contract-risk-scanner"
-EXE_NAME = "ContractReviewAssistant.exe"
+APP_NAME = PRODUCT_NAME
+APP_SLUG = PRODUCT_SLUG
+EXE_NAME = WINDOWS_EXE_NAME
 START_HERE_FILENAME = "START-HERE.cmd"
 QUICK_START_FILENAME = "QUICK-START.txt"
 MANIFEST_FILENAME = "RELEASE-MANIFEST.json"
@@ -151,7 +152,7 @@ def write_quick_start(bundle_dir: Path) -> Path:
         "",
         "Helpful notes:",
         "- If Windows shows a SmartScreen warning, only continue if you trust the release source.",
-        "- The app keeps local scan history under Documents\\Contract Review Assistant Exports\\repository.",
+        f"- The app keeps local scan history under Documents\\{APP_EXPORTS_DIRNAME}\\repository.",
         "- Exported reports save wherever you choose in the Save dialog.",
         "- Do not process contracts unless you are authorized to access them.",
         "",

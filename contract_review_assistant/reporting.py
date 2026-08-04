@@ -5,6 +5,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Iterable
 
+from contract_review_assistant.branding import (
+    DECISION_SUPPORT_NOTICE,
+    PRODUCT_NAME,
+    REPORT_EXECUTIVE_TITLE,
+    REPORT_FULL_TITLE,
+)
 from contract_review_assistant.scanner import ScanResult
 
 
@@ -23,9 +29,9 @@ def build_report_html(
 
     findings = list(results)
     title = (
-        "Executive Contract Risk Summary"
+        REPORT_EXECUTIVE_TITLE
         if report_type == "executive"
-        else "Contract Analysis Report"
+        else REPORT_FULL_TITLE
     )
     generated = datetime.now().strftime("%B %d, %Y at %I:%M %p")
     source_name = Path(source_file).name if source_file else "Unknown contract"
@@ -46,6 +52,7 @@ def build_report_html(
         "body{font-family:Segoe UI,Arial,sans-serif;color:#172033;margin:34px;}",
         "h1{font-size:26px;margin-bottom:4px;color:#0f172a;}",
         "h2{font-size:18px;margin-top:26px;border-bottom:1px solid #cbd5e1;padding-bottom:6px;}",
+        ".brand{color:#0369a1;font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}",
         ".muted{color:#64748b;font-size:11px;}",
         ".cards{width:100%;border-collapse:separate;border-spacing:8px;margin:18px 0;}",
         ".card{border:1px solid #cbd5e1;border-radius:8px;padding:12px;background:#f8fafc;}",
@@ -57,6 +64,7 @@ def build_report_html(
         ".high{color:#c2410c;font-weight:700}.medium{color:#a16207;font-weight:700}.low{color:#15803d;font-weight:700}",
         ".disclaimer{margin-top:28px;padding:10px;border-left:4px solid #94a3b8;background:#f8fafc;font-size:9px;color:#475569;}",
         "</style></head><body>",
+        f"<div class='brand'>{html.escape(PRODUCT_NAME)}</div>",
         f"<h1>{html.escape(title)}</h1>",
         f"<div class='muted'>Contract: {html.escape(source_name)}<br>Generated: {html.escape(generated)}</div>",
         "<table class='cards'><tr>",
@@ -124,7 +132,7 @@ def build_report_html(
 
     sections.extend(
         [
-            "<div class='disclaimer'><b>Decision-support notice:</b> This report supports internal contract review. It does not constitute legal advice and does not replace review by qualified counsel.</div>",
+            f"<div class='disclaimer'><b>Decision-support notice:</b> {html.escape(DECISION_SUPPORT_NOTICE)}</div>",
             "</body></html>",
         ]
     )
@@ -158,12 +166,14 @@ def export_report_docx(
     section.bottom_margin = Inches(0.65)
 
     title = (
-        "Executive Contract Risk Summary"
+        REPORT_EXECUTIVE_TITLE
         if report_type == "executive"
-        else "Contract Analysis Report"
+        else REPORT_FULL_TITLE
     )
     heading = document.add_heading(title, 0)
     heading.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    brand_line = document.add_paragraph(PRODUCT_NAME)
+    brand_line.alignment = WD_ALIGN_PARAGRAPH.CENTER
     document.add_paragraph(f"Contract: {Path(source_file).name if source_file else 'Unknown contract'}")
     document.add_paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}")
 
@@ -218,7 +228,7 @@ def export_report_docx(
         )
 
     disclaimer = document.add_paragraph(
-        "Decision-support notice: This report supports internal contract review. It does not constitute legal advice and does not replace review by qualified counsel."
+        f"Decision-support notice: {DECISION_SUPPORT_NOTICE}"
     )
     for run in disclaimer.runs:
         run.font.size = Pt(8)

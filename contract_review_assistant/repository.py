@@ -8,6 +8,7 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Iterable, List
 
+from .branding import REPORT_FULL_TITLE
 from .scanner import ScanResult
 
 
@@ -85,7 +86,7 @@ def load_repository_entries(repository_dir: Path, legacy_reports_dir: Path | Non
 
 def load_legacy_report_entry(report_path: Path) -> RepositoryEntry | None:
     text = report_path.read_text(encoding="utf-8", errors="ignore")
-    if "Contract Analysis Report" not in text and "Construction Contract Risk Report" not in text:
+    if REPORT_FULL_TITLE not in text and "Contract Analysis Report" not in text and "Construction Contract Risk Report" not in text:
         return None
     source_file = _extract_line_value(text, "Source file:") or str(report_path)
     generated = _extract_line_value(text, "Generated:") or datetime.fromtimestamp(report_path.stat().st_mtime).replace(microsecond=0).isoformat(sep=" ")

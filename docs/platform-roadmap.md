@@ -1,8 +1,8 @@
-# AI Contract Intelligence Platform Roadmap
+# ContractIQ Contract Intelligence Platform Roadmap
 
 ## Objective
 
-Evolve AI Contract Scanner from a desktop analysis application into a modular contract-intelligence platform that can be sold as a complete software asset, licensed as white-label technology, or acquired by a legal-tech, construction-tech, procurement, document-management, or Microsoft solutions company.
+Evolve ContractIQ from a desktop analysis application into a modular contract-intelligence platform that can be sold as a complete software asset, licensed as white-label technology, or acquired by a legal-tech, construction-tech, procurement, document-management, or Microsoft solutions company.
 
 The platform must remain demonstrable as a standalone Windows product while its business logic is separated into reusable services that a buyer can integrate into a web application, API, Word add-in, or existing enterprise platform.
 
@@ -251,7 +251,7 @@ Exit criteria:
 
 ## Recommended commercial positioning
 
-AI Contract Intelligence Platform is a privacy-conscious contract review and comparison engine combining deterministic policy checks with optional AI assistance. It can operate as a standalone Windows application or be integrated into an existing legal-tech, construction-tech, procurement, document-management, or Microsoft 365 platform.
+ContractIQ Contract Intelligence Platform is a privacy-conscious contract review and comparison engine combining deterministic policy checks with optional AI assistance. It can operate as a standalone Windows application or be integrated into an existing legal-tech, construction-tech, procurement, document-management, or Microsoft 365 platform.
 
 ## Immediate development priority
 

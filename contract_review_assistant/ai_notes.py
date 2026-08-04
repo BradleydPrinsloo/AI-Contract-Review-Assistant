@@ -4,6 +4,7 @@ import os
 
 from dotenv import load_dotenv
 
+from .branding import DECISION_SUPPORT_NOTICE, PRODUCT_NAME, REPORT_SUMMARY_TITLE
 from .risk_engine import calculate_risk_assessment
 
 load_dotenv()
@@ -28,7 +29,7 @@ def openai_summary(results, risk_assessment=None) -> str:
         ) or "No findings."
 
         prompt = f"""
-Create a concise internal contract review summary for a business reviewer.
+Create a concise internal contract review summary for a business reviewer using the ContractIQ product voice.
 
 Overall Risk Score: {risk_assessment.total_score}/100
 Risk Rating: {risk_assessment.rating}
@@ -51,7 +52,7 @@ Return:
             messages=[
                 {
                     "role": "system",
-                    "content": "You summarize contract review findings for internal business use. Explain risks and protections clearly, but do not provide legal advice.",
+                    "content": f"You summarize {PRODUCT_NAME} contract review findings for internal business use. Explain risks and protections clearly, but do not provide legal advice.",
                 },
                 {"role": "user", "content": prompt},
             ],
@@ -67,7 +68,7 @@ def rule_summary(results, risk_assessment=None) -> str:
         risk_assessment = calculate_risk_assessment(results)
 
     lines = [
-        "Contract Analysis Summary",
+        REPORT_SUMMARY_TITLE,
         "==============",
         "",
         f"Overall Risk Score: {risk_assessment.total_score}/100",
@@ -90,5 +91,5 @@ def rule_summary(results, risk_assessment=None) -> str:
     for rec in risk_assessment.recommendations:
         lines.append(f"- {rec}")
 
-    lines.extend(["", "Disclaimer: This tool supports internal review and does not provide legal advice."])
+    lines.extend(["", f"Disclaimer: {DECISION_SUPPORT_NOTICE}"])
     return "\n".join(lines)

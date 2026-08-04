@@ -1,0 +1,16 @@
+<svg width="1600" height="420" viewBox="0 0 1600 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mark" x1="44" y1="38" x2="358" y2="370" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67E8F9"/><stop offset="0.52" stop-color="#38BDF8"/><stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="420" rx="44" fill="#07111F"/>
+  <path d="M210 45L336 94V199C336 278 285 339 210 384C135 339 84 278 84 199V94L210 45Z" fill="#0B1220" stroke="url(#mark)" stroke-width="14"/>
+  <path d="M146 115H266L300 149V314H146V115Z" fill="#101F38" stroke="#94A3B8" stroke-width="7"/>
+  <path d="M266 115V151H300" stroke="#38BDF8" stroke-width="7"/>
+  <text x="224" y="342" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="86" font-weight="900" fill="#F8FAFC" letter-spacing="-5">IQ</text>
+  <text x="420" y="188" font-family="Segoe UI, Arial, sans-serif" font-size="118" font-weight="900" fill="#F8FAFC" letter-spacing="-4">Contract<tspan fill="#38BDF8">IQ</tspan></text>
+  <text x="428" y="262" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#94A3B8">Contract intelligence for faster, defensible risk review.</text>
+  <path d="M430 310H1180" stroke="#1E3A5F" stroke-width="2"/>
+  <text x="430" y="355" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#38BDF8" letter-spacing="3">LOCAL-FIRST • EXPLAINABLE • REPORT-READY</text>
+</svg>
