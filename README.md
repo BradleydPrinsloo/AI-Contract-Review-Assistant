@@ -2,7 +2,13 @@
 
 A Windows desktop application for analyzing PDF, DOCX, and TXT contracts, identifying potentially important clauses, calculating a structured risk score, and generating professional review reports.
 
-> **Current engine:** deterministic keyword and clause-pattern analysis with confidence scoring and OCR fallback for scanned PDFs. The application assists human review; it does not provide legal advice.
+> **Current engine:** deterministic keyword and clause-pattern analysis with confidence scoring and OCR fallback for scanned PDFs. Optional AI summaries are available when configured. The application assists human review; it does not provide legal advice.
+
+## Project status
+
+**Phase 1 complete:** the product, interface, report branding, Windows metadata, export paths, release naming, and AI prompts have been generalized under the **AI Contract Scanner** name.
+
+**Next phase:** modern dashboard redesign, summary cards, contract-type rule profiles, improved repository filters, automated tests, and CI validation.
 
 ## Core capabilities
 
@@ -17,6 +23,7 @@ A Windows desktop application for analyzing PDF, DOCX, and TXT contracts, identi
 - Prioritized findings and practical review recommendations
 - Searchable local scan repository
 - CSV, TXT, and formatted DOCX report exports
+- Rule-based summaries with optional OpenAI assistance
 - Portable Windows release bundles with manifests and SHA-256 verification
 - Inno Setup installer asset generation and code-signing workflow documentation
 
@@ -47,14 +54,15 @@ Risk engine
         ├── Category score caps
         └── Recommendations
         │
-        ├───────────────┬──────────────────┐
-        ▼               ▼                  ▼
-Review dashboard   Scan repository   CSV/TXT/DOCX reports
+        ├───────────────┬──────────────────┬─────────────────┐
+        ▼               ▼                  ▼                 ▼
+Review dashboard   Scan repository   CSV/TXT/DOCX     Optional AI
+                                        reports          summary
 ```
 
 ## Application areas
 
-The scanner is being generalized for multiple contract types, including:
+The scanner is designed to support rule libraries for multiple contract types, including:
 
 - General commercial agreements
 - Vendor and supplier agreements
@@ -71,19 +79,25 @@ The scanner is being generalized for multiple contract types, including:
 
 ```text
 AI-Contract-Scanner/
+├── main.py
 ├── contract_review_assistant/
-│   ├── scanner.py
-│   ├── risk_engine.py
-│   ├── repository.py
+│   ├── ai_notes.py
+│   ├── app_paths.py
 │   ├── keyword_library.py
-│   └── app_paths.py
+│   ├── repository.py
+│   ├── risk_engine.py
+│   ├── scanner.py
+│   ├── release_bundle.py
+│   └── release_installer.py
 ├── packaging/
-│   └── release_bundle.py
+│   └── windows/
+│       └── file_version_info.txt
 ├── docs/
 │   ├── architecture.md
 │   ├── installation.md
 │   ├── user-guide.md
 │   └── roadmap.md
+├── requirements.txt
 ├── README.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
@@ -109,7 +123,7 @@ The application can produce structured reports containing:
 
 ## Release workflow
 
-The release tooling creates versioned portable Windows bundles, generates client launch instructions, records included files in a release manifest, calculates SHA-256 checksums, and produces a verified ZIP archive. Separate installer tooling generates an Inno Setup script and signing-ready release instructions.
+The release tooling creates versioned portable Windows bundles, generates launch instructions, records included files in a release manifest, calculates SHA-256 checksums, and produces a verified ZIP archive. Separate installer tooling generates an Inno Setup script and signing-ready release instructions.
 
 ## Documentation
 
@@ -121,16 +135,15 @@ The release tooling creates versioned portable Windows bundles, generates client
 - [Contributing guide](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
 
-## Planned v2 work
+## Phase 2 roadmap
 
-- Complete visible rebrand to **AI Contract Scanner**
-- General-purpose category names
-- Contract-type keyword-library profiles
 - Modernized dashboard and summary cards
+- Contract-type keyword-library profiles
 - Improved repository filters and reviewer notes
 - Expanded automated tests
 - CI validation through GitHub Actions
-- Optional AI-assisted explanations as a separate, clearly identified feature
+- Sanitized screenshots and release documentation
+- Reproducible Windows build configuration
 
 ## Important limitation
 
