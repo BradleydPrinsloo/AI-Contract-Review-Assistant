@@ -6,16 +6,11 @@ The Construction Contract Risk Scanner is designed to assist a user with reviewi
 
 It is a support tool. It does not provide legal advice and should not be treated as a substitute for review by a qualified professional.
 
-## Quick demonstration
-
-The verified portable release includes safe text fixtures for demonstration and release testing.
+## Basic workflow
 
 1. Launch the application with `START-HERE.cmd`.
 2. Select **Open Contract**.
-3. Choose one of the files under `sample_contracts/`:
-   - `01-high-risk-demo.txt`
-   - `02-mixed-context-demo.txt`
-   - `03-subtle-real-clause-demo.txt`
+3. Choose a contract that you are authorized to review.
 4. Select **Scan Contract**.
 5. Review the displayed risk score, findings, and summary.
 
@@ -26,7 +21,7 @@ The verified quick-start documentation indicates support for PDF, DOCX, and TXT 
 Before opening a document:
 
 - Confirm that you are authorized to process it.
-- Avoid using confidential documents in demonstration or public environments.
+- Avoid using confidential documents in demonstrations or public environments.
 - Confirm where exported results and local scan history will be stored.
 - Review all findings manually before relying on them.
 
