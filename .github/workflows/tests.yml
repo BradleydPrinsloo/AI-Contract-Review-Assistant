@@ -35,7 +35,7 @@ jobs:
       - name: Compile source
         run: |
           python -m compileall -q contract_review_assistant
-          python -m py_compile main.py service_main.py
+          python -m py_compile main.py service_main.py v2_main.py
 
       - name: Run tests
         run: python -m pytest -q
