@@ -11,7 +11,6 @@ Based on the current release tooling, the project supports:
 - Portable Windows delivery through `ContractReviewAssistant.exe`
 - Versioned release bundle names
 - Client-facing `START-HERE.cmd` and quick-start instructions
-- Safe sample contract files for demonstrations and release checks
 - Release metadata in `RELEASE-MANIFEST.json`
 - SHA-256 checksums for individual bundle files and the final ZIP archive
 - PowerShell-based checksum verification
@@ -23,7 +22,7 @@ Based on the current release tooling, the project supports:
 The release builder:
 
 1. Reads the product version from Windows packaging metadata.
-2. Validates that the executable, documentation, verification script, and sample files exist.
+2. Validates that the executable, documentation, and verification script exist.
 3. Creates a clean, versioned portable-release directory.
 4. Copies the required client-delivery files.
 5. Generates a launcher, quick-start guide, release manifest, and checksum manifest.
@@ -31,16 +30,6 @@ The release builder:
 7. Generates a SHA-256 checksum for the completed ZIP.
 
 See [`docs/architecture.md`](docs/architecture.md) for a more detailed explanation.
-
-## Demonstration files
-
-The verified release configuration includes three safe text fixtures:
-
-- A high-risk construction-contract example
-- A mixed-context example for separating real findings from noisier language
-- A subtler real-clause example
-
-These fixtures are intended for onboarding, internal demonstrations, and release verification. They are not client contracts.
 
 ## Documentation
 
@@ -69,7 +58,6 @@ AI-Contract-Review-Assistant/
 │   └── roadmap.md
 ├── src/                  # Application source after security review
 ├── tests/                # Automated tests after review
-├── sample_contracts/     # Safe demonstration fixtures only
 ├── packaging/            # Windows packaging configuration
 └── assets/               # Screenshots and project graphics
 ```
