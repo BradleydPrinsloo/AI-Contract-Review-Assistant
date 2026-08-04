@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import sys
 
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
@@ -55,9 +54,6 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
         self.pages = QStackedWidget()
         self.pages.setObjectName("platformPages")
         self.pages.addWidget(dashboard)
-
-        # Contracts intentionally opens the same proven workspace for now.
-        self.pages.addWidget(dashboard)
         self.pages.addWidget(self._module_page("Repository", self.NAV_ITEMS[2][1], "Open Repository"))
         self.pages.addWidget(self._module_page("Clause Library", self.NAV_ITEMS[3][1], "Build Clause Library"))
         self.pages.addWidget(self._module_page("Playbooks", self.NAV_ITEMS[4][1], "Create First Playbook"))
@@ -82,9 +78,7 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
                 border:0; border-radius:8px; padding:11px 13px; font-weight:700;
             }
             QPushButton[navButton="true"]:hover { background:#162033; color:white; }
-            QPushButton[navButton="true"]:checked {
-                background:#1d4ed8; color:white;
-            }
+            QPushButton[navButton="true"]:checked { background:#1d4ed8; color:white; }
             QFrame#modulePage { background:#0b1220; }
             QLabel#moduleTitle { font-size:30px; font-weight:900; color:#f8fafc; }
             QLabel#moduleDescription { color:#94a3b8; font-size:14px; }
@@ -126,7 +120,7 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
 
         status = QLabel("Local-first contract intelligence\nDecision-support platform")
         status.setWordWrap(True)
-        status.setStyleSheet("color:#64748b;font-size:10px;line-height:1.4;")
+        status.setStyleSheet("color:#64748b;font-size:10px;")
         layout.addWidget(status)
         return sidebar
 
@@ -171,9 +165,8 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
         return page
 
     def _navigate(self, index: int) -> None:
-        # Dashboard and Contracts share the current contract workspace during
-        # the first V2 milestone. Independent pages follow in later slices.
-        page_index = 0 if index in {0, 1} else index
+        # Dashboard and Contracts intentionally share the proven review workspace.
+        page_index = 0 if index in {0, 1} else index - 1
         self.pages.setCurrentIndex(page_index)
 
         if index == 2:
