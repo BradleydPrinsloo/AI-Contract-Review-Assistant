@@ -84,12 +84,22 @@ def test_missing_contract_is_reported_clearly(tmp_path: Path) -> None:
         service.analyze(tmp_path / "missing.txt")
 
 
-def test_empty_contract_is_rejected(tmp_path: Path) -> None:
+def test_empty_contract_returns_zero_finding_analysis(tmp_path: Path) -> None:
     rules = tmp_path / "keywords.json"
     contract = tmp_path / "empty.txt"
     write_rules(rules)
     contract.write_text("", encoding="utf-8")
-    service = ContractAnalysisService(rules, summary_provider=lambda _r, _a: "")
+    service = ContractAnalysisService(
+        rules,
+        summary_provider=lambda results, assessment: (
+            f"{len(results)} findings; score {assessment.total_score}"
+        ),
+    )
 
-    with pytest.raises(ValueError, match="No readable contract text"):
-        service.analyze(contract)
+    analysis = service.analyze(contract)
+
+    assert analysis.source_file == str(contract)
+    assert analysis.results == []
+    assert analysis.risk_assessment.finding_count == 0
+    assert analysis.risk_assessment.total_score == 0
+    assert analysis.summary_text == "0 findings; score 0"
