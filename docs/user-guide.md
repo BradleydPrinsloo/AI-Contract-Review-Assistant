@@ -13,7 +13,8 @@ It is a support tool. It does not provide legal advice and should not be treated
 3. Choose a contract that you are authorized to review.
 4. Select **Scan Contract**.
 5. Review the displayed risk score, findings, and summary.
-6. Use **About** to confirm the ContractIQ version and decision-support notice.
+6. Use **Repository** to search saved reviews by vendor, client, reviewer, risk, status, tag, department, or version.
+7. Use **About** to confirm the ContractIQ version and decision-support notice.
 
 ## Using your own document
 

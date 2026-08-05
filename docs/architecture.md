@@ -52,7 +52,8 @@ Desktop UI       Local repository   CSV/TXT/PDF/DOCX  Brand assets   Optional AI
 - `contract_review_assistant/scanner.py` — document extraction, OCR fallback, clause scanning, confidence handling, deduplication, and simple report generation
 - `contract_review_assistant/reporting.py` — branded HTML/PDF/DOCX report templates
 - `contract_review_assistant/risk_engine.py` — weighted scoring, ratings, top findings, and recommendations
-- `contract_review_assistant/repository.py` — JSON scan records, legacy-report import, searching, and report-path updates
+- `contract_review_assistant/repository.py` — repository DTOs, scan-record persistence API, legacy-report import, search compatibility, and report-path helpers
+- `contract_review_assistant/repository_database.py` — SQLite-backed contract database, metadata filters, and idempotent JSON-record import
 - `contract_review_assistant/keyword_library.py` — editable rule-library creation, normalization, and persistence
 - `contract_review_assistant/ai_notes.py` — optional OpenAI summary with a deterministic local fallback
 - `contract_review_assistant/app_paths.py` — development, packaged-build, export, and repository paths
@@ -79,10 +80,10 @@ Packaged builds use:
 ```text
 Documents\ContractIQ Exports\
 ├── keyword-library\keywords.json
-└── repository\*.json
+└── repository\contractiq_repository.sqlite3
 ```
 
-The scanner records structured findings and searchable summary text locally. Real contracts and exported reports must not be committed to the repository.
+The scanner records structured findings, searchable summary text, and enterprise metadata locally in SQLite. Existing JSON records under `repository\*.json` are imported into the database idempotently for backward compatibility. Real contracts and exported reports must not be committed to the repository.
 
 ## Optional AI behavior
 

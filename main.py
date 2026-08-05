@@ -31,6 +31,7 @@ from contract_review_assistant.branding import (
 from contract_review_assistant.contracts import ContractsWorkspaceBuilder
 from contract_review_assistant.keyword_library import ensure_editable_keyword_library
 from contract_review_assistant.repository import load_repository_entries, record_scan, search_repository
+from contract_review_assistant.repository_database import RepositoryFilters
 from contract_review_assistant.risk_engine import calculate_risk_assessment
 from contract_review_assistant.scanner import export_csv, export_docx, export_txt, extract_document, load_keywords, scan_chunks
 
@@ -97,36 +98,136 @@ class RepositoryDialog(QDialog):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent_app = parent
-        self.setWindowTitle("Contract Repository")
-        self.resize(1040, 720)
+        self.setWindowTitle("ContractIQ Repository Database")
+        self.resize(1280, 780)
         self.entries = []
         layout = QVBoxLayout(self)
+        layout.setSpacing(10)
+
+        heading = QLabel("Repository Database")
+        heading.setStyleSheet("font-size:24px;font-weight:900;")
+        description = QLabel(
+            "Search and filter saved contract reviews by portfolio metadata, risk, status, tags, and review history."
+        )
+        description.setWordWrap(True)
+        description.setStyleSheet("color:#94a3b8;")
+        layout.addWidget(heading)
+        layout.addWidget(description)
+
         self.search = QLineEdit()
-        self.search.setPlaceholderText("Search by contract, rating, category, phrase, or summary")
-        self.table = QTableWidget(0, 5)
-        self.table.setHorizontalHeaderLabels(["Scanned", "Contract", "Rating", "Score", "Categories"])
+        self.search.setObjectName("repositorySearchBox")
+        self.search.setPlaceholderText("Search by contract, clause, category, phrase, summary, vendor, client, or reviewer")
+        layout.addWidget(self.search)
+
+        filters = QGridLayout()
+        filters.setHorizontalSpacing(8)
+        filters.setVerticalSpacing(8)
+        self.vendor_filter = self._line_filter("repositoryVendorFilter", "Vendor")
+        self.client_filter = self._line_filter("repositoryClientFilter", "Client")
+        self.reviewer_filter = self._line_filter("repositoryReviewerFilter", "Reviewer")
+        self.department_filter = self._line_filter("repositoryDepartmentFilter", "Department")
+        self.tag_filter = self._line_filter("repositoryTagFilter", "Tag")
+        self.version_filter = self._line_filter("repositoryVersionFilter", "Version")
+        self.risk_filter = QComboBox()
+        self.risk_filter.setObjectName("repositoryRiskFilter")
+        self.risk_filter.addItems(["All risks", "Critical", "High", "Elevated", "Moderate", "Medium", "Low", "Protective", "Neutral", "Info"])
+        self.status_filter = QComboBox()
+        self.status_filter.setObjectName("repositoryStatusFilter")
+        self.status_filter.addItems(["All statuses", "Awaiting Review", "In Review", "Approved", "Rejected", "Legacy Import"])
+        for col, (label, widget) in enumerate(
+            [
+                ("Vendor", self.vendor_filter),
+                ("Client", self.client_filter),
+                ("Reviewer", self.reviewer_filter),
+                ("Risk", self.risk_filter),
+                ("Status", self.status_filter),
+                ("Department", self.department_filter),
+                ("Tag", self.tag_filter),
+                ("Version", self.version_filter),
+            ]
+        ):
+            caption = QLabel(label)
+            caption.setStyleSheet("color:#94a3b8;font-size:11px;font-weight:800;")
+            filters.addWidget(caption, 0 if col < 4 else 2, col % 4)
+            filters.addWidget(widget, 1 if col < 4 else 3, col % 4)
+        layout.addLayout(filters)
+
+        self.table = QTableWidget(0, 12)
+        self.table.setHorizontalHeaderLabels([
+            "Scanned",
+            "Contract",
+            "Vendor",
+            "Client",
+            "Reviewer",
+            "Status",
+            "Risk",
+            "Score",
+            "Department",
+            "Review Date",
+            "Version",
+            "Tags",
+        ])
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setAlternatingRowColors(True)
         self.details = QTextEdit(); self.details.setReadOnly(True)
         self.load_btn = QPushButton("Load Selected Analysis")
         close_btn = QPushButton("Close")
         buttons = QHBoxLayout(); buttons.addWidget(self.load_btn); buttons.addStretch(); buttons.addWidget(close_btn)
-        layout.addWidget(self.search); layout.addWidget(self.table, 2); layout.addWidget(self.details, 1); layout.addLayout(buttons)
+        layout.addWidget(self.table, 2); layout.addWidget(self.details, 1); layout.addLayout(buttons)
         self.search.textChanged.connect(self.refresh)
+        for field in (self.vendor_filter, self.client_filter, self.reviewer_filter, self.department_filter, self.tag_filter, self.version_filter):
+            field.textChanged.connect(self.refresh)
+        self.risk_filter.currentTextChanged.connect(self.refresh)
+        self.status_filter.currentTextChanged.connect(self.refresh)
         self.table.itemSelectionChanged.connect(self.show_selection)
         self.load_btn.clicked.connect(self.load_selected)
         close_btn.clicked.connect(self.close)
 
+    def _line_filter(self, object_name: str, placeholder: str) -> QLineEdit:
+        field = QLineEdit()
+        field.setObjectName(object_name)
+        field.setPlaceholderText(placeholder)
+        return field
+
     def refresh(self):
         entries = load_repository_entries(REPOSITORY_DIR, legacy_reports_dir=EXPORTS_DIR)
-        self.entries = search_repository(entries, self.search.text())
+        filters = RepositoryFilters(
+            vendor=self.vendor_filter.text(),
+            client=self.client_filter.text(),
+            reviewer=self.reviewer_filter.text(),
+            risk=self._combo_value(self.risk_filter, "All risks"),
+            status=self._combo_value(self.status_filter, "All statuses"),
+            tag=self.tag_filter.text(),
+            department=self.department_filter.text(),
+            version=self.version_filter.text(),
+        )
+        self.entries = search_repository(entries, self.search.text(), filters)
         self.table.setRowCount(len(self.entries))
         for row, entry in enumerate(self.entries):
-            for col, value in enumerate([entry.scanned_at, entry.source_name, entry.rating, f"{entry.risk_score}/100", ", ".join(entry.categories[:3])]):
+            values = [
+                entry.scanned_at,
+                entry.source_name,
+                entry.vendor or "—",
+                entry.client or "—",
+                entry.reviewer or "—",
+                entry.status,
+                entry.rating,
+                f"{entry.risk_score}/100",
+                entry.department,
+                entry.review_date or "—",
+                entry.version,
+                ", ".join(entry.tags),
+            ]
+            for col, value in enumerate(values):
                 self.table.setItem(row, col, QTableWidgetItem(str(value)))
         if self.entries: self.table.selectRow(0)
         else: self.details.setPlainText("No saved analyses matched this search.")
+
+    def _combo_value(self, combo: QComboBox, all_label: str) -> str:
+        value = combo.currentText()
+        return "" if value == all_label else value
 
     def selected_entry(self):
         items = self.table.selectedItems()
@@ -137,7 +238,23 @@ class RepositoryDialog(QDialog):
     def show_selection(self):
         entry = self.selected_entry()
         if entry is None: return
-        self.details.setPlainText(f"Contract: {entry.source_name}\nScanned: {entry.scanned_at}\nRating: {entry.rating}\nRisk Score: {entry.risk_score}/100\nFindings: {entry.finding_count}\nCategories: {', '.join(entry.categories) or 'None'}\n\n{entry.summary}")
+        self.details.setPlainText(
+            f"Contract: {entry.source_name}\n"
+            f"Vendor: {entry.vendor or 'Unassigned'}\n"
+            f"Client: {entry.client or 'Unassigned'}\n"
+            f"Reviewer: {entry.reviewer or 'Unassigned'}\n"
+            f"Status: {entry.status}\n"
+            f"Department: {entry.department}\n"
+            f"Review Date: {entry.review_date or 'Unscheduled'}\n"
+            f"Version: {entry.version}\n"
+            f"Tags: {', '.join(entry.tags) or 'None'}\n"
+            f"Scanned: {entry.scanned_at}\n"
+            f"Rating: {entry.rating}\n"
+            f"Risk Score: {entry.risk_score}/100\n"
+            f"Findings: {entry.finding_count}\n"
+            f"Categories: {', '.join(entry.categories) or 'None'}\n\n"
+            f"{entry.summary}"
+        )
         self.load_btn.setEnabled(bool(entry.findings))
 
     def load_selected(self):

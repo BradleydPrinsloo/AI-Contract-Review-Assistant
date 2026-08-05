@@ -8,7 +8,7 @@ ContractIQ is a Windows desktop contract-intelligence application for analyzing 
 
 **ContractIQ identity complete:** the product name, Qt window title, dashboard header, app icon, startup splash, report headers, Windows version metadata, release naming, and documentation now use the ContractIQ brand.
 
-**Version 2.5 milestone 2:** the Contracts workspace is now its own modular UI surface with a guided Open → Scan → Review → Report workflow, dedicated findings and executive-summary panels, and the existing scan/report functionality preserved behind service-backed actions.
+**Version 2.5 milestone 3:** the Repository now uses a SQLite-backed contract database foundation with metadata fields for vendor, client, reviewer, risk, status, tags, department, review date, and version while importing older JSON repository records for backward compatibility.
 
 ## Core capabilities
 
@@ -21,7 +21,7 @@ ContractIQ is a Windows desktop contract-intelligence application for analyzing 
 - Weighted 0–100 risk assessment with category caps
 - Low, Moderate, Elevated, High, and Critical ratings
 - Prioritized findings and practical review recommendations
-- Searchable local scan repository
+- Searchable local SQLite contract repository with metadata filters
 - CSV, TXT, PDF, and formatted DOCX report exports
 - Rule-based summaries with optional OpenAI assistance
 - Portable Windows release bundle tooling with manifests and SHA-256 verification
@@ -99,6 +99,7 @@ AI-Contract-Scanner/
 │   ├── keyword_library.py
 │   ├── reporting.py
 │   ├── repository.py
+│   ├── repository_database.py
 │   ├── risk_engine.py
 │   └── scanner.py
 ├── packaging/
