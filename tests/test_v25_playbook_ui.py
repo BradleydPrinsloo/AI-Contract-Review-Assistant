@@ -15,11 +15,11 @@ def test_playbook_page_replaces_placeholder_and_exposes_editor_controls() -> Non
 
     app = QApplication.instance() or QApplication([])
     window = VersionTwoContractPlatform()
-    window._navigate(4)
+    window._navigate(3)
     window.show()
     app.processEvents()
 
-    page = window.pages.widget(4)
+    page = window.pages.widget(3)
     assert page.objectName() == "playbookPage"
     assert window.playbook_page is page
 
@@ -73,7 +73,7 @@ def test_playbook_page_can_save_clause_backed_playbook_offscreen() -> None:
 
     app = QApplication.instance() or QApplication([])
     window = VersionTwoContractPlatform()
-    window._navigate(4)
+    window._navigate(3)
     page = window.playbook_page
     suffix = uuid4().hex[:8]
     page._new_playbook()

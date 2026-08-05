@@ -14,11 +14,11 @@ def test_clause_library_page_replaces_placeholder_module() -> None:
 
     app = QApplication.instance() or QApplication([])
     window = VersionTwoContractPlatform()
-    window._navigate(3)
+    window._navigate(2)
     window.show()
     app.processEvents()
 
-    page = window.pages.widget(3)
+    page = window.pages.widget(2)
     assert page.objectName() == "clauseLibraryPage"
 
     labels = "\n".join(label.text() for label in page.findChildren(QLabel))
