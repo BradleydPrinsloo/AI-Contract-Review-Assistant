@@ -19,7 +19,7 @@ import main as desktop
 from contract_review_assistant.branding import PRODUCT_DISPLAY_NAME, PRODUCT_NAME, PRODUCT_VERSION
 from contract_review_assistant.dashboard.metrics import build_dashboard_summary, empty_dashboard_summary
 from contract_review_assistant.repository import load_repository_entries
-from contract_review_assistant.ui import ClauseLibraryPage, ExecutiveDashboardPage
+from contract_review_assistant.ui import ClauseLibraryPage, ExecutiveDashboardPage, PlaybookPage
 from service_main import ServiceBackedContractScannerApp
 
 
@@ -45,6 +45,7 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
         self.dashboard_page: ExecutiveDashboardPage | None = None
         self.contracts_workspace: QWidget | None = None
         self.clause_library_page: ClauseLibraryPage | None = None
+        self.playbook_page: PlaybookPage | None = None
         self._install_enterprise_shell()
 
     def _install_enterprise_shell(self) -> None:
@@ -66,11 +67,16 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
             desktop.CLAUSE_LIBRARY_DB,
             service=self.clause_library_service,
         )
+        self.playbook_page = PlaybookPage(
+            desktop.PLAYBOOK_DB,
+            clause_library_service=self.clause_library_service,
+            service=self.playbook_service,
+        )
         self.pages.addWidget(self.dashboard_page)
         self.pages.addWidget(self.contracts_workspace)
         self.pages.addWidget(self._module_page("Repository", self.NAV_ITEMS[2][1], "Open Repository"))
         self.pages.addWidget(self.clause_library_page)
-        self.pages.addWidget(self._module_page("Playbooks", self.NAV_ITEMS[4][1], "Create First Playbook"))
+        self.pages.addWidget(self.playbook_page)
         self.pages.addWidget(self._module_page("Compliance", self.NAV_ITEMS[5][1], "Configure Compliance Rules"))
         self.pages.addWidget(self._module_page("Analytics", self.NAV_ITEMS[6][1], "View Analytics Roadmap"))
         self.pages.addWidget(self._module_page("Reports", self.NAV_ITEMS[7][1], "Generate Contract Report"))
@@ -130,6 +136,18 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
                 background:#0f172a; border:1px solid #263449; border-radius:12px;
             }
             QLabel#clauseSectionTitle { color:#f8fafc; font-size:18px; font-weight:900; }
+            QWidget#playbookPage { background:#080f1d; }
+            QFrame#playbookHero {
+                background:qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #13213b, stop:1 #111c30);
+                border:1px solid #1e3a5f; border-radius:16px;
+            }
+            QLabel#playbookEyebrow { color:#67e8f9; font-weight:900; letter-spacing:2px; }
+            QLabel#playbookTitle { color:#f8fafc; font-size:32px; font-weight:900; }
+            QLabel#playbookDetail { color:#94a3b8; font-size:13px; }
+            QFrame#playbookFilters, QFrame#playbookListPanel, QFrame#playbookEditorPanel {
+                background:#0f172a; border:1px solid #263449; border-radius:12px;
+            }
+            QLabel#playbookSectionTitle { color:#f8fafc; font-size:18px; font-weight:900; }
             """
         )
 
@@ -226,7 +244,7 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
             self.open_repository()
         elif module_name == "Reports":
             self.generate_report()
-        elif module_name in {"Playbooks", "Compliance", "Analytics", "Administration"}:
+        elif module_name in {"Compliance", "Analytics", "Administration"}:
             self.statusBar().showMessage(
                 f"{module_name} is scheduled for the next Version 2.5 development milestone.",
                 6000,

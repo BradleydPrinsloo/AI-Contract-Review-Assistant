@@ -8,6 +8,7 @@ from .branding import APP_EXPORTS_DIRNAME, LEGACY_EXPORTS_DIRNAMES
 
 APP_REPOSITORY_DIRNAME = "repository"
 APP_CLAUSE_LIBRARY_DIRNAME = "clause-library"
+APP_PLAYBOOKS_DIRNAME = "playbooks"
 LEGACY_EXPORTS_DIRNAME = LEGACY_EXPORTS_DIRNAMES[0]
 
 
@@ -58,3 +59,8 @@ def default_repository_dir(home: Path | None = None, exports_dir: Path | None = 
 def default_clause_library_dir(home: Path | None = None, exports_dir: Path | None = None) -> Path:
     base_dir = exports_dir or default_exports_dir(home=home)
     return base_dir / APP_CLAUSE_LIBRARY_DIRNAME
+
+
+def default_playbooks_dir(home: Path | None = None, exports_dir: Path | None = None) -> Path:
+    base_dir = exports_dir or default_exports_dir(home=home)
+    return base_dir / APP_PLAYBOOKS_DIRNAME

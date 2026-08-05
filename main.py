@@ -19,6 +19,7 @@ from contract_review_assistant.ai_notes import openai_summary
 from contract_review_assistant.app_paths import (
     default_clause_library_dir,
     default_exports_dir,
+    default_playbooks_dir,
     default_repository_dir,
     external_or_bundled_path,
 )
@@ -40,6 +41,7 @@ from contract_review_assistant.clauses import (
     enrich_findings_with_clause_library,
 )
 from contract_review_assistant.keyword_library import ensure_editable_keyword_library
+from contract_review_assistant.playbooks import PlaybookLibraryService, playbook_database_path
 from contract_review_assistant.repository import load_repository_entries, record_scan, search_repository
 from contract_review_assistant.repository_database import RepositoryFilters
 from contract_review_assistant.risk_engine import calculate_risk_assessment
@@ -53,6 +55,8 @@ EXPORTS_DIR = default_exports_dir()
 REPOSITORY_DIR = default_repository_dir(exports_dir=EXPORTS_DIR)
 CLAUSE_LIBRARY_DIR = default_clause_library_dir(exports_dir=EXPORTS_DIR)
 CLAUSE_LIBRARY_DB = clause_library_database_path(CLAUSE_LIBRARY_DIR)
+PLAYBOOKS_DIR = default_playbooks_dir(exports_dir=EXPORTS_DIR)
+PLAYBOOK_DB = playbook_database_path(PLAYBOOKS_DIR)
 RISK_COLORS = {"critical":"#ef4444","high":"#f97316","elevated":"#f59e0b","moderate":"#eab308","medium":"#eab308","low":"#22c55e","protective":"#14b8a6","neutral":"#94a3b8","info":"#94a3b8"}
 
 
@@ -285,9 +289,10 @@ class ContractScannerApp(QMainWindow):
         self.setWindowTitle(APP_TITLE)
         self.resize(1600, 980)
         if APP_ICON_PATH.exists(): self.setWindowIcon(QIcon(str(APP_ICON_PATH)))
-        EXPORTS_DIR.mkdir(parents=True, exist_ok=True); REPOSITORY_DIR.mkdir(parents=True, exist_ok=True); CLAUSE_LIBRARY_DIR.mkdir(parents=True, exist_ok=True)
+        EXPORTS_DIR.mkdir(parents=True, exist_ok=True); REPOSITORY_DIR.mkdir(parents=True, exist_ok=True); CLAUSE_LIBRARY_DIR.mkdir(parents=True, exist_ok=True); PLAYBOOKS_DIR.mkdir(parents=True, exist_ok=True)
         self.keyword_path = ensure_editable_keyword_library(KEYWORD_SOURCE, EXPORTS_DIR / "keyword-library" / "keywords.json")
         self.clause_library_service = ClauseLibraryService(CLAUSE_LIBRARY_DB)
+        self.playbook_service = PlaybookLibraryService(PLAYBOOK_DB, clause_library_service=self.clause_library_service)
         self.current_file = None; self.results = []; self.assessment = None; self.summary = ""
         self.scan_thread = None; self.scan_worker = None
         self.repository_dialog = RepositoryDialog(self)

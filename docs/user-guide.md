@@ -15,7 +15,8 @@ It is a support tool. It does not provide legal advice and should not be treated
 5. Review the displayed risk score, findings, summary, and any Clause Library guidance attached to each finding.
 6. Use **Repository** to search saved reviews by vendor, client, reviewer, risk, status, tag, department, or version.
 7. Use **Clause Library** to maintain organization-approved clause wording, rejected wording, examples, risk levels, and explanation notes.
-8. Use **About** to confirm the ContractIQ version and decision-support notice.
+8. Use **Playbooks** to group clause standards and checklist items for a specific contract type.
+9. Use **About** to confirm the ContractIQ version and decision-support notice.
 
 ## Clause Library workflow
 
@@ -31,6 +32,21 @@ The Clause Library stores organization-specific wording standards separately fro
 Explanation notes are provider-abstracted. If no AI provider adapter is configured, ContractIQ stores deterministic local notes instead of calling a hardcoded AI service.
 
 When a scanned finding matches an active Clause Library standard, the finding detail panel and full reports include the standard name, approved wording, rejected wording, examples, and explanation notes. Use this as review guidance only; the reviewer must still confirm the actual contract language and surrounding context.
+
+## Playbook workflow
+
+Playbooks group Clause Library standards into reusable contract-type review standards.
+
+1. Open **Playbooks** from the platform sidebar.
+2. Select **New Playbook**.
+3. Enter a playbook name, contract type, risk tolerance, status, and description.
+4. Use **Clause Standards** to assign active Clause Library records as required, preferred, or escalation standards.
+5. Add checklist items using one line per item: `item text | Required/Optional | owner role | escalation guidance`.
+6. Select **Save Playbook** to store the playbook locally.
+7. Use search, risk tolerance, and status filters to find active or archived playbooks.
+8. Select **Archive Playbook** when a review standard should no longer be used, while preserving its audit history.
+
+Playbooks currently establish the review-standard foundation. Applying a selected playbook during scan will be implemented in the next milestone.
 
 ## Using your own document
 

@@ -12,6 +12,7 @@
 - Added the Phase 2 Clause Library foundation with SQLite-backed clause CRUD, versioned audit history, approved/rejected wording fields, examples, risk levels, and a provider abstraction for explanation notes.
 - Replaced the Clause Library placeholder with a professional PySide6 editor page in the Version 2.5 platform shell.
 - Connected scanner findings to active Clause Library standards so matched findings carry approved wording, rejected wording, examples, and explanation notes into the UI, repository, and reports.
+- Added the Phase 2 Playbook foundation with SQLite-backed playbook CRUD, audit history, risk tolerance, status, Clause Library standard assignments, checklist items, and a professional PySide6 editor page.
 - Updated product versioning to ContractIQ v2.5 and refreshed CI coverage for offscreen PySide6 shell tests.
 
 ## 2.0.0 — ContractIQ rebrand
