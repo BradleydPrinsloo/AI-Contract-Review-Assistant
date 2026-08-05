@@ -14,7 +14,21 @@ It is a support tool. It does not provide legal advice and should not be treated
 4. Select **Scan Contract**.
 5. Review the displayed risk score, findings, and summary.
 6. Use **Repository** to search saved reviews by vendor, client, reviewer, risk, status, tag, department, or version.
-7. Use **About** to confirm the ContractIQ version and decision-support notice.
+7. Use **Clause Library** to maintain organization-approved clause wording, rejected wording, examples, risk levels, and explanation notes.
+8. Use **About** to confirm the ContractIQ version and decision-support notice.
+
+## Clause Library workflow
+
+The Clause Library stores organization-specific wording standards separately from scanned contract history.
+
+1. Open **Clause Library** from the platform sidebar.
+2. Select **New Clause**.
+3. Enter a clause name, category, risk level, company wording, rejected wording, examples, and optional explanation notes.
+4. Select **Save Clause** to store the clause standard locally.
+5. Use search, risk, and status filters to find active or archived clauses.
+6. Select **Archive Clause** when a standard should no longer be used, while preserving its audit history.
+
+Explanation notes are provider-abstracted. If no AI provider adapter is configured, ContractIQ stores deterministic local notes instead of calling a hardcoded AI service.
 
 ## Using your own document
 

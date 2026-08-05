@@ -9,6 +9,8 @@
 - Added a modular Contracts workspace with guided Open → Scan → Review → Report steps, dedicated findings and executive-summary panels, and preserved service-backed report generation.
 - Added a SQLite-backed Repository database foundation with filters for vendor, client, reviewer, risk, status, tags, department, review date, and version.
 - Preserved backward compatibility by importing existing JSON repository records into SQLite idempotently.
+- Added the Phase 2 Clause Library foundation with SQLite-backed clause CRUD, versioned audit history, approved/rejected wording fields, examples, risk levels, and a provider abstraction for explanation notes.
+- Replaced the Clause Library placeholder with a professional PySide6 editor page in the Version 2.5 platform shell.
 - Updated product versioning to ContractIQ v2.5 and refreshed CI coverage for offscreen PySide6 shell tests.
 
 ## 2.0.0 — ContractIQ rebrand

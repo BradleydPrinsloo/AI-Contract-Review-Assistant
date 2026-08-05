@@ -43,10 +43,12 @@ Desktop UI       Local repository   CSV/TXT/PDF/DOCX  Brand assets   Optional AI
 
 - `main.py` — PySide6 application shell adapter, startup splash, About dialog, background scan worker, repository browser, and legacy export actions
 - `service_main.py` — service-backed desktop entry point with report-generation workflow
-- `v2_main.py` — Version 2.5 platform shell with separate Executive Dashboard and Contracts workspace routing
+- `v2_main.py` — Version 2.5 platform shell with separate Executive Dashboard, Contracts workspace, Repository, and Clause Library routing
 - `contract_review_assistant/branding.py` — ContractIQ product constants, report titles, executable naming, and decision-support notices
+- `contract_review_assistant/clauses/library.py` — SQLite-backed Clause Library domain service, validation, CRUD, audit history, and explanation-provider abstraction
 - `contract_review_assistant/contracts/workspace.py` — dedicated Contracts workspace UI composition for Open → Scan → Review → Report workflows
 - `contract_review_assistant/dashboard/metrics.py` — repository-derived executive dashboard KPI calculations
+- `contract_review_assistant/ui/clause_library_page.py` — professional PySide6 Clause Library editor page
 - `contract_review_assistant/ui/dashboard_page.py` — read-only PySide6 Executive Dashboard page
 - `contract_review_assistant/ui/charts.py` — lightweight dashboard chart widgets
 - `contract_review_assistant/scanner.py` — document extraction, OCR fallback, clause scanning, confidence handling, deduplication, and simple report generation
@@ -80,10 +82,11 @@ Packaged builds use:
 ```text
 Documents\ContractIQ Exports\
 ├── keyword-library\keywords.json
-└── repository\contractiq_repository.sqlite3
+├── repository\contractiq_repository.sqlite3
+└── clause-library\contractiq_clause_library.sqlite3
 ```
 
-The scanner records structured findings, searchable summary text, and enterprise metadata locally in SQLite. Existing JSON records under `repository\*.json` are imported into the database idempotently for backward compatibility. Real contracts and exported reports must not be committed to the repository.
+The scanner records structured findings, searchable summary text, and enterprise metadata locally in SQLite. Existing JSON records under `repository\*.json` are imported into the database idempotently for backward compatibility. The Clause Library stores company wording standards, rejected wording, examples, explanation notes, and versioned audit events in its own SQLite database. Real contracts, exported reports, and generated local databases must not be committed to the repository.
 
 ## Optional AI behavior
 
