@@ -10,7 +10,8 @@
   <path d="M266 115V151H300" stroke="#38BDF8" stroke-width="7"/>
   <text x="224" y="342" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="86" font-weight="900" fill="#F8FAFC" letter-spacing="-5">IQ</text>
   <text x="420" y="188" font-family="Segoe UI, Arial, sans-serif" font-size="118" font-weight="900" fill="#F8FAFC" letter-spacing="-4">Contract<tspan fill="#38BDF8">IQ</tspan></text>
-  <text x="428" y="262" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#94A3B8">Contract intelligence for faster, defensible risk review.</text>
-  <path d="M430 310H1180" stroke="#1E3A5F" stroke-width="2"/>
-  <text x="430" y="355" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#38BDF8" letter-spacing="3">LOCAL-FIRST • EXPLAINABLE • REPORT-READY</text>
+  <text x="428" y="250" font-family="Segoe UI, Arial, sans-serif" font-size="36" font-weight="800" fill="#F8FAFC">Know Every Clause. <tspan fill="#38BDF8">Reduce Every Risk.</tspan></text>
+  <text x="430" y="298" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="600" fill="#94A3B8">Professional Contract Intelligence Platform.</text>
+  <path d="M430 330H1180" stroke="#1E3A5F" stroke-width="2"/>
+  <text x="430" y="370" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#38BDF8" letter-spacing="3">LOCAL-FIRST • EXPLAINABLE • REPORT-READY</text>
 </svg>

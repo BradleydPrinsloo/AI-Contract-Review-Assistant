@@ -8,7 +8,7 @@ ContractIQ is a Windows desktop contract-intelligence application for analyzing 
 
 **ContractIQ identity complete:** the product name, Qt window title, dashboard header, app icon, startup splash, report headers, Windows version metadata, release naming, and documentation now use the ContractIQ brand.
 
-**Next phase:** continue the Version 2 platform build with deeper clause-library management, playbooks, repository filters, reviewer notes, analytics, and reproducible Windows packaging.
+**Version 2.5 milestone 1:** the platform now has a separate Executive Dashboard with KPI cards, risk distribution, recent contracts, recent activity, and review statistics. Scanner controls live in the Contracts workspace instead of the Dashboard.
 
 ## Core capabilities
 
@@ -90,6 +90,8 @@ AI-Contract-Scanner/
 ├── v2_main.py
 ├── contract_review_assistant/
 │   ├── branding.py
+│   ├── dashboard/
+│   ├── ui/
 │   ├── ai_notes.py
 │   ├── app_paths.py
 │   ├── application_service.py
@@ -119,6 +121,7 @@ The Python package retains its existing internal name temporarily to avoid break
 - **Logo:** `assets/contractiq_logo.svg`
 - **Application icon:** `assets/contractiq.ico` and `assets/contractiq_icon.png`
 - **Startup splash:** `assets/contractiq_splash.png`
+- **Current version:** `ContractIQ v2.5`
 - **Windows metadata:** `packaging/windows/file_version_info.txt`
 
 ## Reporting

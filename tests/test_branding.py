@@ -14,7 +14,7 @@ from contract_review_assistant.branding import (
 
 def test_contractiq_branding_constants_are_consistent() -> None:
     assert PRODUCT_NAME == "ContractIQ"
-    assert PRODUCT_VERSION == "2.0.0"
+    assert PRODUCT_VERSION == "2.5"
     assert APP_EXPORTS_DIRNAME == "ContractIQ Exports"
     assert WINDOWS_EXE_NAME == "ContractIQ.exe"
     assert REPORT_FULL_TITLE == "ContractIQ Contract Analysis Report"

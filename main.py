@@ -22,6 +22,7 @@ from contract_review_assistant.branding import (
     APP_SPLASH_FILENAME,
     DECISION_SUPPORT_NOTICE,
     PRODUCT_DESCRIPTION,
+    PRODUCT_DISPLAY_NAME,
     PRODUCT_NAME,
     PRODUCT_TAGLINE,
     PRODUCT_VERSION,
@@ -32,7 +33,7 @@ from contract_review_assistant.repository import load_repository_entries, record
 from contract_review_assistant.risk_engine import calculate_risk_assessment
 from contract_review_assistant.scanner import export_csv, export_docx, export_txt, extract_document, load_keywords, scan_chunks
 
-APP_TITLE = PRODUCT_NAME
+APP_TITLE = PRODUCT_DISPLAY_NAME
 APP_ICON_PATH = external_or_bundled_path("assets", APP_ICON_FILENAME)
 APP_SPLASH_PATH = external_or_bundled_path("assets", APP_SPLASH_FILENAME)
 KEYWORD_SOURCE = external_or_bundled_path("data", "keywords.json")

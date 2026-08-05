@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 PRODUCT_NAME = "ContractIQ"
-PRODUCT_VERSION = "2.0.0"
-PRODUCT_TAGLINE = "Contract intelligence for faster, defensible risk review."
-PRODUCT_DESCRIPTION = (
-    "Local-first contract intelligence with OCR fallback, explainable scoring, "
-    "searchable review history, and professional reports."
-)
+PRODUCT_DISPLAY_NAME = "ContractIQ™"
+PRODUCT_VERSION = "2.5"
+PRODUCT_VERSION_LABEL = f"{PRODUCT_NAME} v{PRODUCT_VERSION}"
+PRODUCT_TAGLINE = "Know Every Clause.\nReduce Every Risk."
+PRODUCT_DESCRIPTION = "Professional Contract Intelligence Platform."
 COMPANY_NAME = "Bradley Prinsloo"
 COPYRIGHT_NOTICE = "Copyright © Bradley Prinsloo. All rights reserved."
 

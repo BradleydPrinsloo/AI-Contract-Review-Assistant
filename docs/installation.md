@@ -27,7 +27,7 @@ For the service-backed report workflow, run:
 python service_main.py
 ```
 
-For the Version 2 platform shell, run:
+For the Version 2.5 platform shell, run:
 
 ```powershell
 python v2_main.py
