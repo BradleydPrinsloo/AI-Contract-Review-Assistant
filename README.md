@@ -8,14 +8,14 @@ ContractIQ is a Windows desktop contract-intelligence application for analyzing 
 
 **ContractIQ identity complete:** the product name, Qt window title, dashboard header, app icon, startup splash, report headers, Windows version metadata, release naming, and documentation now use the ContractIQ brand.
 
-**Phase 2 milestone 1:** the Clause Library now has a SQLite-backed professional editor for company-standard clauses, risk levels, approved wording, rejected wording, examples, audit history, and provider-abstracted explanation notes.
+**Phase 2 milestone 2:** scanner findings now enrich from the Clause Library, linking detected risks to company-approved wording, rejected wording, examples, and explanation notes in the review UI and reports.
 
 ## Core capabilities
 
 - PDF, DOCX, and TXT document extraction
 - OCR fallback when a PDF does not contain usable embedded text
 - Configurable keyword library with aliases, categories, risk levels, finding types, and review notes
-- Clause Library for company preferred wording, rejected wording, examples, risk levels, and versioned history
+- Clause Library for company preferred wording, rejected wording, examples, risk levels, versioned history, and scanner-finding guidance
 - Built-in clause-pattern detection
 - Operative-language and negation checks to reduce obvious false positives
 - Confidence scoring and duplicate-finding reduction
@@ -45,7 +45,8 @@ Keyword and clause-pattern scanner
         ├── Operative-language checks
         ├── Negation/context checks
         ├── Confidence assignment
-        └── Finding deduplication
+        ├── Finding deduplication
+        └── Clause Library guidance enrichment
         │
         ▼
 Risk engine
@@ -138,7 +139,7 @@ ContractIQ reports can contain:
 - Category breakdown
 - Top review priorities
 - Recommendations
-- Detailed findings with location, context, confidence, and review priority
+- Detailed findings with location, context, confidence, review priority, and matched Clause Library guidance
 - Reviewer sign-off fields in DOCX output
 - ContractIQ decision-support notice
 

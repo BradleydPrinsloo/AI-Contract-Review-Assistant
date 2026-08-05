@@ -4,6 +4,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Protocol
 
+from contract_review_assistant.clauses import (
+    ClauseLibraryService,
+    enrich_findings_with_clause_library,
+)
 from contract_review_assistant.risk_engine import calculate_risk_assessment
 from contract_review_assistant.scanner import (
     ScanResult,
@@ -43,9 +47,11 @@ class ContractAnalysisService:
         keyword_path: str | Path,
         *,
         summary_provider: SummaryProvider | None = None,
+        clause_library_service: ClauseLibraryService | None = None,
     ) -> None:
         self.keyword_path = Path(keyword_path)
         self.summary_provider = summary_provider
+        self.clause_library_service = clause_library_service
 
     def analyze(
         self,
@@ -71,6 +77,8 @@ class ContractAnalysisService:
 
         notify("Analyzing clauses…", 65)
         results = scan_chunks(chunks, rules)
+        notify("Applying clause-library guidance…", 78)
+        results = enrich_findings_with_clause_library(results, self.clause_library_service)
         assessment = calculate_risk_assessment(results)
 
         notify("Preparing review summary…", 90)
@@ -91,11 +99,12 @@ class ContractAnalysisService:
     ) -> ContractAnalysis:
         """Recalculate score and summary after reviewer changes."""
 
+        results = enrich_findings_with_clause_library(list(results), self.clause_library_service)
         assessment = calculate_risk_assessment(results)
         summary = self._create_summary(results, assessment)
         return ContractAnalysis(
             source_file=str(source_file),
-            results=list(results),
+            results=results,
             risk_assessment=assessment,
             summary_text=summary,
         )

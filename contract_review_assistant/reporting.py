@@ -116,7 +116,7 @@ def build_report_html(
                     html.escape(item.risk),
                     item.score,
                     html.escape(item.location),
-                    html.escape(item.note),
+                    _finding_guidance_html(item),
                     html.escape(item.context),
                 )
             )
@@ -220,6 +220,7 @@ def export_report_docx(
             document.add_paragraph(f"Location: {item.location}")
             document.add_paragraph(f"Review guidance: {item.note}")
             document.add_paragraph(f"Context: {item.context}")
+            _add_docx_clause_guidance(document, item)
 
     if include_recommendations:
         document.add_heading("Recommended Next Step", level=1)
@@ -249,6 +250,38 @@ def _text_to_html(text: str) -> str:
         else:
             paragraphs.append(f"<p>{html.escape(stripped)}</p>")
     return "".join(paragraphs)
+
+
+def _finding_guidance_html(item: ScanResult) -> str:
+    parts = [html.escape(item.note)]
+    if item.clause_library_name:
+        parts.extend(
+            [
+                "<br><br><b>Clause Library Guidance</b>",
+                f"<br><b>Standard:</b> {html.escape(item.clause_library_name)}",
+                f"<br><b>Approved wording:</b> {html.escape(item.preferred_wording)}",
+            ]
+        )
+        if item.rejected_wording:
+            parts.append(f"<br><b>Rejected wording:</b> {html.escape(item.rejected_wording)}")
+        if item.clause_examples:
+            parts.append(f"<br><b>Examples:</b> {html.escape('; '.join(item.clause_examples))}")
+        if item.clause_explanation:
+            parts.append(f"<br><b>Explanation:</b> {html.escape(item.clause_explanation)}")
+    return "".join(parts)
+
+
+def _add_docx_clause_guidance(document, item: ScanResult) -> None:
+    if not item.clause_library_name:
+        return
+    document.add_paragraph(f"Clause Library Guidance: {item.clause_library_name}")
+    document.add_paragraph(f"Approved wording: {item.preferred_wording}")
+    if item.rejected_wording:
+        document.add_paragraph(f"Rejected wording: {item.rejected_wording}")
+    if item.clause_examples:
+        document.add_paragraph(f"Examples: {'; '.join(item.clause_examples)}")
+    if item.clause_explanation:
+        document.add_paragraph(f"Explanation: {item.clause_explanation}")
 
 
 def _risk_class(risk: str) -> str:

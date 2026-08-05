@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Iterable
@@ -23,6 +23,12 @@ class ScanResult:
     note: str
     context: str
     reason: str = ""
+    clause_library_id: str = ""
+    clause_library_name: str = ""
+    preferred_wording: str = ""
+    rejected_wording: str = ""
+    clause_examples: list[str] = field(default_factory=list)
+    clause_explanation: str = ""
 
 
 def load_keywords(path: str | Path) -> list[dict]:
@@ -160,9 +166,9 @@ def export_csv(results: Iterable[ScanResult], output_path: str | Path, source_fi
         if risk_assessment is not None:
             writer.writerow(["Risk Score", risk_assessment.total_score, "Rating", risk_assessment.rating])
         writer.writerow([])
-        writer.writerow(["Phrase", "Category", "Finding Type", "Risk", "Score", "Confidence", "Location", "Note", "Context"])
+        writer.writerow(["Phrase", "Category", "Finding Type", "Risk", "Score", "Confidence", "Location", "Note", "Context", "Clause Library", "Preferred Wording", "Rejected Wording"])
         for item in results:
-            writer.writerow([item.phrase, item.category, item.finding_type, item.risk, item.score, item.confidence, item.location, item.note, item.context])
+            writer.writerow([item.phrase, item.category, item.finding_type, item.risk, item.score, item.confidence, item.location, item.note, item.context, item.clause_library_name, item.preferred_wording, item.rejected_wording])
     return output
 
 
@@ -170,7 +176,20 @@ def export_txt(results: Iterable[ScanResult], source_file: str, output_path: str
     output = Path(output_path)
     lines = [REPORT_FULL_TITLE, "========================", f"Source file: {source_file}", f"Generated: {datetime.now().isoformat(timespec='seconds')}", f"Overall Risk Score: {risk_assessment.total_score}/100", f"Risk Rating: {risk_assessment.rating}", f"Finding Count: {risk_assessment.finding_count}", f"Risk Findings: {risk_assessment.risk_count}", f"Protective Findings: {risk_assessment.protective_count}", f"Neutral/Info Findings: {risk_assessment.neutral_count}", "", summary_text.strip(), "", "Detailed findings", "-----------------"]
     for index, item in enumerate(results, 1):
-        lines.extend([f"{index}. {item.phrase} [{item.finding_type}/{item.risk}]", f"Category: {item.category}", f"Location: {item.location}", f"Score: {item.score} | Confidence: {item.confidence}%", f"Note: {item.note}", f"Context: {item.context}", ""])
+        lines.extend([f"{index}. {item.phrase} [{item.finding_type}/{item.risk}]", f"Category: {item.category}", f"Location: {item.location}", f"Score: {item.score} | Confidence: {item.confidence}%", f"Note: {item.note}", f"Context: {item.context}"])
+        if item.clause_library_name:
+            lines.extend([
+                "Clause Library Guidance:",
+                f"- Standard: {item.clause_library_name}",
+                f"- Approved wording: {item.preferred_wording}",
+            ])
+            if item.rejected_wording:
+                lines.append(f"- Rejected wording: {item.rejected_wording}")
+            if item.clause_examples:
+                lines.append(f"- Examples: {'; '.join(item.clause_examples)}")
+            if item.clause_explanation:
+                lines.append(f"- Explanation: {item.clause_explanation}")
+        lines.append("")
     lines.append(f"Disclaimer: {DECISION_SUPPORT_NOTICE}")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("\n".join(lines), encoding="utf-8")
@@ -197,6 +216,15 @@ def export_docx(results: Iterable[ScanResult], source_file: str, output_path: st
         document.add_paragraph(f"Location: {item.location}")
         document.add_paragraph(f"Review note: {item.note}")
         document.add_paragraph(item.context)
+        if item.clause_library_name:
+            document.add_paragraph(f"Clause Library Guidance: {item.clause_library_name}")
+            document.add_paragraph(f"Approved wording: {item.preferred_wording}")
+            if item.rejected_wording:
+                document.add_paragraph(f"Rejected wording: {item.rejected_wording}")
+            if item.clause_examples:
+                document.add_paragraph(f"Examples: {'; '.join(item.clause_examples)}")
+            if item.clause_explanation:
+                document.add_paragraph(f"Explanation: {item.clause_explanation}")
     disclaimer = document.add_paragraph(DECISION_SUPPORT_NOTICE)
     for run in disclaimer.runs:
         run.font.size = Pt(9)

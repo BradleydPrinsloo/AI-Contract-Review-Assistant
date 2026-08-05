@@ -224,7 +224,7 @@ class ContractsWorkspaceBuilder:
         header.addWidget(app.risk_filter)
         layout.addLayout(header)
 
-        app.table = QTableWidget(0, 9)
+        app.table = QTableWidget(0, 10)
         app.table.setObjectName("contractFindingsTable")
         app.table.setHorizontalHeaderLabels(
             [
@@ -236,6 +236,7 @@ class ContractsWorkspaceBuilder:
                 "Confidence",
                 "Location",
                 "Review Note",
+                "Library Standard",
                 "Context",
             ]
         )

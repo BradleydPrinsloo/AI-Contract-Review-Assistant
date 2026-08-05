@@ -33,10 +33,13 @@ class ServiceScanWorker(QObject):
     finished = Signal(object)
     failed = Signal(str)
 
-    def __init__(self, source_file: str, keyword_path):
+    def __init__(self, source_file: str, keyword_path, clause_library_service=None):
         super().__init__()
         self.source_file = source_file
-        self.service = ContractAnalysisService(keyword_path)
+        self.service = ContractAnalysisService(
+            keyword_path,
+            clause_library_service=clause_library_service,
+        )
 
     @Slot()
     def run(self) -> None:
@@ -178,7 +181,11 @@ class ServiceBackedContractScannerApp(desktop.ContractScannerApp):
         self.status_badge.setText("ANALYZING")
 
         self.scan_thread = QThread(self)
-        self.scan_worker = ServiceScanWorker(self.current_file, self.keyword_path)
+        self.scan_worker = ServiceScanWorker(
+            self.current_file,
+            self.keyword_path,
+            self.clause_library_service,
+        )
         self.scan_worker.moveToThread(self.scan_thread)
         self.scan_thread.started.connect(self.scan_worker.run)
         self.scan_worker.progress.connect(self.update_progress)
@@ -206,7 +213,10 @@ class ServiceBackedContractScannerApp(desktop.ContractScannerApp):
 
         remaining = list(self.results)
         remaining.pop(index)
-        service = ContractAnalysisService(self.keyword_path)
+        service = ContractAnalysisService(
+            self.keyword_path,
+            clause_library_service=self.clause_library_service,
+        )
         analysis = service.reassess(self.current_file or "", remaining)
 
         self.results = analysis.results

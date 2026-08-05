@@ -16,7 +16,12 @@ from PySide6.QtWidgets import (
 )
 
 from contract_review_assistant.ai_notes import openai_summary
-from contract_review_assistant.app_paths import default_exports_dir, default_repository_dir, external_or_bundled_path
+from contract_review_assistant.app_paths import (
+    default_clause_library_dir,
+    default_exports_dir,
+    default_repository_dir,
+    external_or_bundled_path,
+)
 from contract_review_assistant.branding import (
     APP_ICON_FILENAME,
     APP_SPLASH_FILENAME,
@@ -29,6 +34,11 @@ from contract_review_assistant.branding import (
     REPORT_SUMMARY_TITLE,
 )
 from contract_review_assistant.contracts import ContractsWorkspaceBuilder
+from contract_review_assistant.clauses import (
+    ClauseLibraryService,
+    clause_library_database_path,
+    enrich_findings_with_clause_library,
+)
 from contract_review_assistant.keyword_library import ensure_editable_keyword_library
 from contract_review_assistant.repository import load_repository_entries, record_scan, search_repository
 from contract_review_assistant.repository_database import RepositoryFilters
@@ -41,6 +51,8 @@ APP_SPLASH_PATH = external_or_bundled_path("assets", APP_SPLASH_FILENAME)
 KEYWORD_SOURCE = external_or_bundled_path("data", "keywords.json")
 EXPORTS_DIR = default_exports_dir()
 REPOSITORY_DIR = default_repository_dir(exports_dir=EXPORTS_DIR)
+CLAUSE_LIBRARY_DIR = default_clause_library_dir(exports_dir=EXPORTS_DIR)
+CLAUSE_LIBRARY_DB = clause_library_database_path(CLAUSE_LIBRARY_DIR)
 RISK_COLORS = {"critical":"#ef4444","high":"#f97316","elevated":"#f59e0b","moderate":"#eab308","medium":"#eab308","low":"#22c55e","protective":"#14b8a6","neutral":"#94a3b8","info":"#94a3b8"}
 
 
@@ -57,10 +69,11 @@ class ScanWorker(QObject):
     finished = Signal(object)
     failed = Signal(str)
 
-    def __init__(self, source_file: str, keyword_path: Path):
+    def __init__(self, source_file: str, keyword_path: Path, clause_library_service=None):
         super().__init__()
         self.source_file = source_file
         self.keyword_path = keyword_path
+        self.clause_library_service = clause_library_service
 
     @Slot()
     def run(self):
@@ -71,6 +84,8 @@ class ScanWorker(QObject):
             chunks = extract_document(self.source_file)
             self.progress.emit("Analyzing clauses…", 65)
             results = scan_chunks(chunks, rules)
+            self.progress.emit("Applying clause-library guidance…", 78)
+            results = enrich_findings_with_clause_library(results, self.clause_library_service)
             assessment = calculate_risk_assessment(results)
             self.progress.emit("Preparing review summary…", 90)
             summary = openai_summary(results, assessment)
@@ -270,8 +285,9 @@ class ContractScannerApp(QMainWindow):
         self.setWindowTitle(APP_TITLE)
         self.resize(1600, 980)
         if APP_ICON_PATH.exists(): self.setWindowIcon(QIcon(str(APP_ICON_PATH)))
-        EXPORTS_DIR.mkdir(parents=True, exist_ok=True); REPOSITORY_DIR.mkdir(parents=True, exist_ok=True)
+        EXPORTS_DIR.mkdir(parents=True, exist_ok=True); REPOSITORY_DIR.mkdir(parents=True, exist_ok=True); CLAUSE_LIBRARY_DIR.mkdir(parents=True, exist_ok=True)
         self.keyword_path = ensure_editable_keyword_library(KEYWORD_SOURCE, EXPORTS_DIR / "keyword-library" / "keywords.json")
+        self.clause_library_service = ClauseLibraryService(CLAUSE_LIBRARY_DB)
         self.current_file = None; self.results = []; self.assessment = None; self.summary = ""
         self.scan_thread = None; self.scan_worker = None
         self.repository_dialog = RepositoryDialog(self)
@@ -309,7 +325,7 @@ class ContractScannerApp(QMainWindow):
     def analyze_contract(self):
         if not self.current_file or self.scan_thread is not None:return
         self.open_btn.setEnabled(False); self.analyze_btn.setEnabled(False); self.status_badge.setText("ANALYZING")
-        self.scan_thread=QThread(self); self.scan_worker=ScanWorker(self.current_file,self.keyword_path); self.scan_worker.moveToThread(self.scan_thread)
+        self.scan_thread=QThread(self); self.scan_worker=ScanWorker(self.current_file,self.keyword_path,self.clause_library_service); self.scan_worker.moveToThread(self.scan_thread)
         self.scan_thread.started.connect(self.scan_worker.run); self.scan_worker.progress.connect(self.update_progress); self.scan_worker.finished.connect(self.scan_complete); self.scan_worker.failed.connect(self.scan_failed)
         self.scan_worker.finished.connect(self.scan_thread.quit); self.scan_worker.failed.connect(self.scan_thread.quit); self.scan_thread.finished.connect(self.cleanup_thread); self.scan_thread.start()
 
@@ -343,11 +359,11 @@ class ContractScannerApp(QMainWindow):
         self.table.setSortingEnabled(False); self.table.setRowCount(0)
         query=self.search_box.text().strip().casefold(); selected=self.risk_filter.currentText().casefold()
         for index,item in enumerate(self.results):
-            searchable=" ".join(str(v) for v in (item.phrase,item.category,item.finding_type,item.risk,item.location,item.note,item.context)).casefold()
+            searchable=" ".join(str(v) for v in (item.phrase,item.category,item.finding_type,item.risk,item.location,item.note,item.context,item.clause_library_name,item.preferred_wording,item.rejected_wording,item.clause_explanation)).casefold()
             if query and query not in searchable: continue
             if selected!="all risks" and item.risk.casefold()!=selected: continue
             row=self.table.rowCount(); self.table.insertRow(row)
-            vals=[item.phrase,item.category,item.finding_type,item.risk,item.score,f"{item.confidence}%",item.location,item.note,item.context]
+            vals=[item.phrase,item.category,item.finding_type,item.risk,item.score,f"{item.confidence}%",item.location,item.note,item.clause_library_name,item.context]
             for col,val in enumerate(vals):
                 cell=QTableWidgetItem(str(val)); cell.setToolTip(str(val))
                 if col==0: cell.setData(Qt.UserRole,index)
@@ -368,8 +384,27 @@ class ContractScannerApp(QMainWindow):
         if index is None or not (0<=index<len(self.results)):
             self.false_positive_btn.setEnabled(False); return
         item=self.results[index]
-        self.detail_view.setHtml(f"<h3>{html.escape(item.phrase)}</h3><p><b>Category:</b> {html.escape(item.category)}<br><b>Type:</b> {html.escape(item.finding_type)}<br><b>Risk:</b> {html.escape(item.risk)}<br><b>Confidence:</b> {item.confidence}%<br><b>Location:</b> {html.escape(item.location)}</p><p><b>Review guidance</b><br>{html.escape(item.note)}</p><p><b>Full context</b><br>{html.escape(item.context)}</p>")
+        clause_guidance=self.format_clause_guidance_html(item)
+        self.detail_view.setHtml(f"<h3>{html.escape(item.phrase)}</h3><p><b>Category:</b> {html.escape(item.category)}<br><b>Type:</b> {html.escape(item.finding_type)}<br><b>Risk:</b> {html.escape(item.risk)}<br><b>Confidence:</b> {item.confidence}%<br><b>Location:</b> {html.escape(item.location)}</p><p><b>Review guidance</b><br>{html.escape(item.note)}</p>{clause_guidance}<p><b>Full context</b><br>{html.escape(item.context)}</p>")
         self.false_positive_btn.setEnabled(True)
+
+    @staticmethod
+    def format_clause_guidance_html(item):
+        if not getattr(item,"clause_library_name",""):
+            return ""
+        parts=[
+            "<p><b>Clause Library Guidance</b><br>",
+            f"<b>Standard:</b> {html.escape(item.clause_library_name)}<br>",
+            f"<b>Approved wording:</b> {html.escape(item.preferred_wording)}<br>",
+        ]
+        if getattr(item,"rejected_wording",""):
+            parts.append(f"<b>Rejected wording:</b> {html.escape(item.rejected_wording)}<br>")
+        if getattr(item,"clause_examples",[]):
+            parts.append(f"<b>Examples:</b> {html.escape('; '.join(item.clause_examples))}<br>")
+        if getattr(item,"clause_explanation",""):
+            parts.append(f"<b>Explanation:</b> {html.escape(item.clause_explanation)}")
+        parts.append("</p>")
+        return "".join(parts)
 
     def mark_false_positive(self):
         index=self.selected_result_index()

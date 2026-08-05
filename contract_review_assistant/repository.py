@@ -341,9 +341,14 @@ def _build_search_text(
                 "context",
                 "location",
                 "reason",
+                "clause_library_name",
+                "preferred_wording",
+                "rejected_wording",
+                "clause_examples",
+                "clause_explanation",
             )
         )
-    return "\n".join(part for part in parts if part)
+    return "\n".join(str(part) for part in parts if part)
 
 
 def _extract_line_value(text: str, prefix: str) -> str | None:

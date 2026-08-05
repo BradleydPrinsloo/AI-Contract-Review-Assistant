@@ -12,7 +12,7 @@ It is a support tool. It does not provide legal advice and should not be treated
 2. Select **Open Contract**.
 3. Choose a contract that you are authorized to review.
 4. Select **Scan Contract**.
-5. Review the displayed risk score, findings, and summary.
+5. Review the displayed risk score, findings, summary, and any Clause Library guidance attached to each finding.
 6. Use **Repository** to search saved reviews by vendor, client, reviewer, risk, status, tag, department, or version.
 7. Use **Clause Library** to maintain organization-approved clause wording, rejected wording, examples, risk levels, and explanation notes.
 8. Use **About** to confirm the ContractIQ version and decision-support notice.
@@ -29,6 +29,8 @@ The Clause Library stores organization-specific wording standards separately fro
 6. Select **Archive Clause** when a standard should no longer be used, while preserving its audit history.
 
 Explanation notes are provider-abstracted. If no AI provider adapter is configured, ContractIQ stores deterministic local notes instead of calling a hardcoded AI service.
+
+When a scanned finding matches an active Clause Library standard, the finding detail panel and full reports include the standard name, approved wording, rejected wording, examples, and explanation notes. Use this as review guidance only; the reviewer must still confirm the actual contract language and surrounding context.
 
 ## Using your own document
 
@@ -57,10 +59,11 @@ A detected phrase is not automatically a legal problem. Context matters. Users s
 1. Open the contract.
 2. Run the scan.
 3. Review high-priority findings first.
-4. Read the surrounding clause text.
-5. Mark false positives or items requiring escalation.
-6. Export or record the review results.
-7. Escalate legal interpretation to a qualified reviewer.
+4. Compare matched findings against any Clause Library approved/rejected wording.
+5. Read the surrounding clause text.
+6. Mark false positives or items requiring escalation.
+7. Export or record the review results.
+8. Escalate legal interpretation to a qualified reviewer.
 
 ## Data handling
 

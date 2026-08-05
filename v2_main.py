@@ -16,9 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 import main as desktop
-from contract_review_assistant.app_paths import default_clause_library_dir
 from contract_review_assistant.branding import PRODUCT_DISPLAY_NAME, PRODUCT_NAME, PRODUCT_VERSION
-from contract_review_assistant.clauses import clause_library_database_path
 from contract_review_assistant.dashboard.metrics import build_dashboard_summary, empty_dashboard_summary
 from contract_review_assistant.repository import load_repository_entries
 from contract_review_assistant.ui import ClauseLibraryPage, ExecutiveDashboardPage
@@ -64,8 +62,10 @@ class VersionTwoContractPlatform(ServiceBackedContractScannerApp):
         self.pages = QStackedWidget()
         self.pages.setObjectName("platformPages")
         self.dashboard_page = ExecutiveDashboardPage(self._dashboard_summary())
-        clause_library_dir = default_clause_library_dir(exports_dir=desktop.EXPORTS_DIR)
-        self.clause_library_page = ClauseLibraryPage(clause_library_database_path(clause_library_dir))
+        self.clause_library_page = ClauseLibraryPage(
+            desktop.CLAUSE_LIBRARY_DB,
+            service=self.clause_library_service,
+        )
         self.pages.addWidget(self.dashboard_page)
         self.pages.addWidget(self.contracts_workspace)
         self.pages.addWidget(self._module_page("Repository", self.NAV_ITEMS[2][1], "Open Repository"))
