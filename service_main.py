@@ -149,11 +149,19 @@ class ServiceBackedContractScannerApp(desktop.ContractScannerApp):
         self.txt_btn.hide()
 
         self.generate_report_btn = QPushButton("Generate Report")
-        root_layout = self.centralWidget().layout()
-        action_layout = root_layout.itemAt(1).layout()
-        action_layout.insertWidget(
-            max(0, action_layout.count() - 1), self.generate_report_btn
+        action_layout = getattr(self, "report_actions_layout", None)
+        if action_layout is None:
+            root_layout = self.centralWidget().layout()
+            action_item = root_layout.itemAt(1)
+            action_layout = action_item.layout() if action_item is not None else None
+        if action_layout is None:
+            raise RuntimeError("Contracts workspace action layout is not available.")
+        insert_index = getattr(
+            self,
+            "report_action_insert_index",
+            max(0, action_layout.count() - 1),
         )
+        action_layout.insertWidget(insert_index, self.generate_report_btn)
         self.generate_report_btn.clicked.connect(self.generate_report)
 
     def set_actions_enabled(self, analyzed):

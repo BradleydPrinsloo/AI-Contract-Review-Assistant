@@ -43,9 +43,9 @@ repository/
 *.sqlite3
 
 # Client and private documents
-contracts/
-client_contracts/
-private_samples/
+/contracts/
+/client_contracts/
+/private_samples/
 *.pdf
 *.docx
 

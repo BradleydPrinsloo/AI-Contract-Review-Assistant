@@ -41,10 +41,11 @@ Desktop UI       Local repository   CSV/TXT/PDF/DOCX  Brand assets   Optional AI
 
 ## Main components
 
-- `main.py` — PySide6 Contracts workspace interface, startup splash, About dialog, background scan worker, findings table, summaries, repository browser, and exports
+- `main.py` — PySide6 application shell adapter, startup splash, About dialog, background scan worker, repository browser, and legacy export actions
 - `service_main.py` — service-backed desktop entry point with report-generation workflow
 - `v2_main.py` — Version 2.5 platform shell with separate Executive Dashboard and Contracts workspace routing
 - `contract_review_assistant/branding.py` — ContractIQ product constants, report titles, executable naming, and decision-support notices
+- `contract_review_assistant/contracts/workspace.py` — dedicated Contracts workspace UI composition for Open → Scan → Review → Report workflows
 - `contract_review_assistant/dashboard/metrics.py` — repository-derived executive dashboard KPI calculations
 - `contract_review_assistant/ui/dashboard_page.py` — read-only PySide6 Executive Dashboard page
 - `contract_review_assistant/ui/charts.py` — lightweight dashboard chart widgets

@@ -28,6 +28,7 @@ from contract_review_assistant.branding import (
     PRODUCT_VERSION,
     REPORT_SUMMARY_TITLE,
 )
+from contract_review_assistant.contracts import ContractsWorkspaceBuilder
 from contract_review_assistant.keyword_library import ensure_editable_keyword_library
 from contract_review_assistant.repository import load_repository_entries, record_scan, search_repository
 from contract_review_assistant.risk_engine import calculate_risk_assessment
@@ -160,63 +161,9 @@ class ContractScannerApp(QMainWindow):
         self.build_ui()
 
     def build_ui(self):
-        self.setStyleSheet("""
-            QWidget { background:#0b1220; color:#e5e7eb; font-size:13px; }
-            QPushButton { background:#2563eb; color:white; border:0; border-radius:8px; padding:10px 15px; font-weight:700; }
-            QPushButton:hover { background:#1d4ed8; } QPushButton:disabled { background:#334155; color:#94a3b8; }
-            QLineEdit,QComboBox,QTableWidget,QTextEdit { background:#0f172a; border:1px solid #334155; border-radius:8px; padding:6px; }
-            QHeaderView::section { background:#1e293b; padding:8px; border:0; font-weight:700; }
-            QTableWidget { gridline-color:#263449; alternate-background-color:#111c30; }
-            QProgressBar { background:#1e293b; border:0; border-radius:5px; min-height:10px; }
-            QProgressBar::chunk { background:#3b82f6; border-radius:5px; }
-            QSplitter::handle { background:#1e293b; width:3px; }
-        """)
-        root = QWidget(); layout = QVBoxLayout(root); layout.setContentsMargins(20,18,20,16); layout.setSpacing(12)
-        header = QHBoxLayout(); text = QVBoxLayout()
-        title = QLabel(PRODUCT_NAME); title.setStyleSheet("font-size:30px;font-weight:900;")
-        subtitle = QLabel(PRODUCT_TAGLINE); subtitle.setStyleSheet("color:#94a3b8;font-size:14px;")
-        text.addWidget(title); text.addWidget(subtitle); header.addLayout(text,1)
-        self.status_badge = QLabel("READY"); self.status_badge.setAlignment(Qt.AlignCenter); self.status_badge.setFixedWidth(120)
-        self.status_badge.setStyleSheet("background:#1e293b;color:#93c5fd;border:1px solid #334155;border-radius:14px;padding:7px;font-weight:800;")
-        header.addWidget(self.status_badge); layout.addLayout(header)
-        actions = QHBoxLayout()
-        self.open_btn=QPushButton("Open Contract"); self.analyze_btn=QPushButton("Scan Contract"); self.summary_btn=QPushButton("Expand Summary")
-        self.repository_btn=QPushButton("Repository"); self.docx_btn=QPushButton("Export Word"); self.csv_btn=QPushButton("Export CSV"); self.txt_btn=QPushButton("Export Text"); self.about_btn=QPushButton("About")
-        for b in (self.open_btn,self.analyze_btn,self.summary_btn,self.repository_btn,self.docx_btn,self.csv_btn,self.txt_btn,self.about_btn): actions.addWidget(b)
-        actions.addStretch(); layout.addLayout(actions)
-        cards=QGridLayout(); cards.setHorizontalSpacing(10)
-        self.score_frame,self.score_value,_=self.make_card("Overall Risk","—")
-        self.rating_frame,self.rating_value,_=self.make_card("Rating","Not analyzed")
-        self.findings_frame,self.findings_value,self.severity_value=self.make_card("Total Findings","0","High 0  •  Medium 0  •  Low 0")
-        self.high_frame,self.high_value,_=self.make_card("High Priority","0")
-        self.contract_frame,self.contract_value,_=self.make_card("Contract","None selected")
-        for col, frame in enumerate((self.score_frame,self.rating_frame,self.findings_frame,self.high_frame,self.contract_frame)): cards.addWidget(frame,0,col)
-        layout.addLayout(cards)
-        self.status=QLabel("Ready. Open a contract to begin."); self.progress=QProgressBar(); self.progress.setRange(0,100); self.progress.setValue(0); self.progress.setTextVisible(False)
-        layout.addWidget(self.status); layout.addWidget(self.progress)
-        splitter=QSplitter(Qt.Horizontal); splitter.setChildrenCollapsible(False)
-        left=QFrame(); left.setStyleSheet("QFrame{background:#0f172a;border:1px solid #263449;border-radius:10px;}"); ll=QVBoxLayout(left)
-        fh=QHBoxLayout(); heading=QLabel("Contract Findings"); heading.setStyleSheet("font-size:18px;font-weight:900;border:0;")
-        self.search_box=QLineEdit(); self.search_box.setPlaceholderText("Search findings…"); self.search_box.setMaximumWidth(300)
-        self.risk_filter=QComboBox(); self.risk_filter.addItems(["All risks","Critical","High","Elevated","Moderate","Medium","Low","Protective","Neutral","Info"]); self.risk_filter.setMaximumWidth(160)
-        fh.addWidget(heading); fh.addStretch(); fh.addWidget(self.search_box); fh.addWidget(self.risk_filter); ll.addLayout(fh)
-        self.table=QTableWidget(0,9); self.table.setHorizontalHeaderLabels(["Phrase","Category","Type","Risk","Score","Confidence","Location","Review Note","Context"])
-        self.table.setSelectionBehavior(QAbstractItemView.SelectRows); self.table.setEditTriggers(QAbstractItemView.NoEditTriggers); self.table.setAlternatingRowColors(True); self.table.setSortingEnabled(True)
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive); self.table.horizontalHeader().setStretchLastSection(True); self.table.verticalHeader().setVisible(False); ll.addWidget(self.table,1)
-        right=QFrame(); right.setMinimumWidth(430); right.setStyleSheet("QFrame{background:#0f172a;border:1px solid #263449;border-radius:10px;}"); rl=QVBoxLayout(right)
-        sh=QLabel("Executive Summary"); sh.setStyleSheet("font-size:18px;font-weight:900;border:0;")
-        self.summary_view=QTextEdit(); self.summary_view.setReadOnly(True); self.summary_view.setHtml(self.format_summary_html("Open and scan a contract to display the executive summary here."))
-        dh=QLabel("Selected Finding"); dh.setStyleSheet("font-size:16px;font-weight:900;border:0;margin-top:6px;")
-        self.detail_view=QTextEdit(); self.detail_view.setReadOnly(True); self.detail_view.setMaximumHeight(230); self.detail_view.setPlainText("Select a finding row to inspect its full context and review guidance.")
-        self.false_positive_btn=QPushButton("Mark Selected as False Positive"); self.false_positive_btn.setEnabled(False)
-        rl.addWidget(sh); rl.addWidget(self.summary_view,2); rl.addWidget(dh); rl.addWidget(self.detail_view,1); rl.addWidget(self.false_positive_btn)
-        splitter.addWidget(left); splitter.addWidget(right); splitter.setSizes([1050,500]); layout.addWidget(splitter,1)
-        footer=QLabel(DECISION_SUPPORT_NOTICE); footer.setStyleSheet("color:#94a3b8;"); layout.addWidget(footer)
-        self.setCentralWidget(root)
-        self.open_btn.clicked.connect(self.open_contract); self.analyze_btn.clicked.connect(self.analyze_contract); self.summary_btn.clicked.connect(self.show_summary)
-        self.repository_btn.clicked.connect(self.open_repository); self.docx_btn.clicked.connect(self.export_docx_report); self.csv_btn.clicked.connect(self.export_csv_report); self.txt_btn.clicked.connect(self.export_txt_report); self.about_btn.clicked.connect(self.show_about)
-        self.search_box.textChanged.connect(self.apply_filters); self.risk_filter.currentTextChanged.connect(self.apply_filters); self.table.itemSelectionChanged.connect(self.show_selected_finding)
-        self.false_positive_btn.clicked.connect(self.mark_false_positive); self.set_actions_enabled(False)
+        """Install the dedicated Contracts workspace UI."""
+
+        ContractsWorkspaceBuilder(self).install()
 
     def make_card(self,label,value,detail=""):
         frame=QFrame(); frame.setStyleSheet("QFrame{background:#162033;border:1px solid #334155;border-radius:11px;}")
